@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --leather-texture: #4a321d;
+  --paper-texture: #fdfbf7;
+  --accent-color: #d97706;
+}
+
+body {
+  font-family: 'Patrick Hand', cursive;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Gloria Hallelujah', cursive;
+}
+
+.dot-grid {
+  background-image: radial-gradient(#d1d5db 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.journal-container {
+  background-color: var(--leather-texture);
+  box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(0, 0, 0, 0.4);
+  border: 12px solid #3d2b1a;
+  position: relative;
+}
+
+.leather-grain {
+  background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC-oJM9ABslMreJkUHPr6Vduclhh3RZ7DypCTQDlGnTk0gWjDou9UxgUxS7Ln8CAXOWroYjWd32AGf-UboyztIwlmfpiUzKo_gY5xmgbbRzzMN-it9Hpj3hl4Q89ngOdZR2S2y6oBBUM6OgFJ8mmYFnJVKGMg3i-bShWZFjbbsmGhrNgE_7Y672_q61IVQjVp1BQ1zWAhdhae9hWdnn7vRuPrQU9mLQmVGF3qqSBZ_3JPUp_mPgYCtOHs0-lBCP6dozP5L9Bpoq7c8');
+}
+
+/* Replaced wood-desk with a simple paper-like background */
+.paper-background {
+  background-color: #fdfbf7;
+  background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.spine-crease {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.15) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0.15) 100%);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.marker-underline {
+  position: relative;
+  z-index: 1;
+}
+
+.marker-underline::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: -4px;
+  width: 110%;
+  height: 12px;
+  background: rgba(217, 119, 6, 0.2);
+  z-index: -1;
+  transform: rotate(-0.5deg);
+  border-radius: 2px;
+}
+
+.washi-tape {
+  background: rgba(217, 119, 6, 0.7);
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"40\"><path d=\"M0 0 L100 0 L100 40 L0 40 Z\" /></svg>");
+  clip-path: polygon(5% 0%, 95% 2%, 100% 50%, 98% 95%, 5% 100%, 0% 50%);
+  backdrop-filter: blur(1px);
+}
+
+.doodle-stroke {
+  stroke: var(--accent-color);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.7;
+}
+
+.hand-drawn-border {
+  border: 2px solid rgba(94, 62, 36, 0.1);
+  border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+}
