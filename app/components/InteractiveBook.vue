@@ -74,7 +74,8 @@ onMounted(async () => {
       showPageCorners: false,
       clickEventForward: false,
       useMouseEvents: true,
-      swipeDistance: 30
+      swipeDistance: 30,
+      startZIndex: 0
     });
 
     const pages = bookRef.value.querySelectorAll('.page-content');
@@ -144,7 +145,7 @@ watch(() => route.fullPath, () => {
       
       <!-- SVG SPIRAL BINDING (Centered) -->
       <!-- LEATHER CORDS BINDING -->
-      <div class="hidden md:flex w-16 absolute left-1/2 top-0 bottom-0 -translate-x-1/2 z-50 pointer-events-none select-none flex-col justify-evenly py-10">
+      <div class="hidden md:flex w-16 absolute left-1/2 top-0 bottom-0 -translate-x-1/2 z-[2] pointer-events-none select-none flex-col justify-evenly py-10">
          <div v-for="i in 3" :key="i" class="relative w-full h-8 flex items-center justify-center">
              <!-- The Cord -->
              <div class="w-[120%] h-2 bg-[#3e2723] rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.4)] relative z-10 flex items-center justify-center">
