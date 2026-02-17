@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import IntroLeft from '~/components/content/IntroLeft.vue'
 import IntroRight from '~/components/content/IntroRight.vue'
@@ -17,7 +17,7 @@ const bookRef = ref(null);
 const route = useRoute();
 const router = useRouter();
 let pageFlipInstance = null;
-let isFlippingByRoute = false; // Flag to prevent circular updates
+let isFlippingFromRoute = false; 
 
 // Map routes to page indices
 // Page 0: Cover (Route: /)
@@ -25,26 +25,23 @@ let isFlippingByRoute = false; // Flag to prevent circular updates
 // Page 3-4: Spread 2 (Route: /read/2)
 // ...
 const getPageIndexFromRoute = () => {
-  // If we are at root, we want to show the Intro spread (Pages 1 & 2)
-  if (route.path === '/' || route.path === '/book') return 1;
+  // Root -> Cover (Page 0)
+  if (route.path === '/' || route.path === '/book') return 0;
   const spreadParam = route.params.spread;
-  if (!spreadParam) return 1; // Default to Intro if invalid
+  const spreadId = spreadParam ? parseInt(Array.isArray(spreadParam) ? spreadParam[0] : spreadParam) : 1;
   
-  const spreadId = parseInt(Array.isArray(spreadParam) ? spreadParam[0] : spreadParam);
-  if (isNaN(spreadId)) return 1;
+  if (isNaN(spreadId) || spreadId < 1) return 1;
 
-  // Spread 1 (Intro) -> Page 1
-  // Spread 2 (Garden) -> Page 3
+  // Spread 1 -> Page 1
+  // Spread 2 -> Page 3
   // Formula: (Spread - 1) * 2 + 1
   return (spreadId - 1) * 2 + 1;
 };
 
 const getRouteFromPageIndex = (pageIndex) => {
-  if (pageIndex === 0) return '/?cover=true'; // Optional: explicit cover url or just '/'
+  if (pageIndex === 0) return '/'; 
   
-  // Page 1, 2 -> Spread 1 -> '/'
-  if (pageIndex === 1 || pageIndex === 2) return '/';
-  
+  // Page 1, 2 -> Spread 1 -> '/read/1'
   // Page 3, 4 -> Spread 2 -> '/read/2'
   const spreadId = Math.floor((pageIndex - 1) / 2) + 1;
   return `/read/${spreadId}`;
@@ -53,123 +50,89 @@ const getRouteFromPageIndex = (pageIndex) => {
 onMounted(async () => {
   const { PageFlip } = await import('page-flip');
 
+  await nextTick();
+
   if (bookRef.value) {
     const startPage = getPageIndexFromRoute();
 
-    const pageFlip = new PageFlip(bookRef.value, {
-      width: 550, // Base width per page
-      height: 733, // Base height
-      // force spread view
+    pageFlipInstance = new PageFlip(bookRef.value, {
+      width: 550,
+      height: 733,
       size: "stretch",
-      minWidth: 500, // Significantly lowered to allow fitting on smaller screens
+      minWidth: 300,
       maxWidth: 2000,
-      minHeight: 300,
+      minHeight: 400,
       maxHeight: 2000,
       showCover: true,
       drawShadow: true,
-      maxShadowOpacity: 0.2,
-      flippingTime: 1000,
-      usePortrait: false, // Attempt to force landscape/spread
-      startPage: startPage, // Start at correct page based on URL
+      maxShadowOpacity: 0.1,
+      flippingTime: 800,
+      usePortrait: false,
+      startPage: startPage,
       mobileScrollSupport: true,
-      showHover: false, // Disable dynamic corner peel
-      showPageCorners: false, // Helper to hide corners visual
-      clickEventForward: false, // Prevent default click on invalid areas
-      useMouseEvents: true // Needed for drag, but we want to kill hover
+      showHover: false,
+      showPageCorners: false,
+      clickEventForward: false,
+      useMouseEvents: true,
+      swipeDistance: 30
     });
 
     const pages = bookRef.value.querySelectorAll('.page-content');
-    pageFlip.loadFromHTML(pages);
-    pageFlipInstance = pageFlip;
+    pageFlipInstance.loadFromHTML(pages);
 
-    // EVENT: Flip -> Route
-    pageFlip.on('flip', (e) => {
-      // If the flip was triggered by our route watcher, ignore strictly to avoid double push
-      // But page-flip doesn't pass that context easily.
-      // We check if the expected route matches current.
+    // EVENT: Flip -> Update Route
+    pageFlipInstance.on('flip', (e) => {
       const newPageIndex = e.data;
       const newPath = getRouteFromPageIndex(newPageIndex);
       
-      if (route.path !== newPath && !isFlippingByRoute) {
-        router.push(newPath);
+      if (route.path !== newPath) {
+        // Only push if not already triggered by route
+        if (!isFlippingFromRoute) {
+          router.push(newPath);
+        }
       }
-      isFlippingByRoute = false; // Reset flag after flip
+      isFlippingFromRoute = false;
     });
   }
 });
 
-// WATCH: Route -> Flip
+onBeforeUnmount(() => {
+  if (pageFlipInstance) {
+    pageFlipInstance.destroy();
+    pageFlipInstance = null;
+  }
+});
+
+// WATCH: Route -> Trigger Flip
 watch(() => route.fullPath, () => {
   if (!pageFlipInstance) return;
   const targetPage = getPageIndexFromRoute();
-  
-  // Check if we are already seeing this page (or its spread partner)
-  const currentOrient = pageFlipInstance.getOrientation(); // 'landscape' or 'portrait'
   const currentPage = pageFlipInstance.getCurrentPageIndex();
 
-  // If already close enough (spread view), skip
+  // Check if we are already seeing this page (or its spread partner)
   if (currentPage === targetPage || (currentPage + 1 === targetPage && currentPage % 2 === 1)) {
-     return;
+    return;
+  }
+
+  // CRITICAL: Check if an animation is already in progress
+  const state = pageFlipInstance.getState();
+  if (state !== 'read') {
+    // If we are already flipping, targetPage will eventually be reached or 
+    // we should wait for the current one to finish. 
+    // However, if the user clicked a TOC link, we want to OVERRIDE if possible
+    // or at least not start a concurrent animation that glitches.
+    return;
   }
   
-  isFlippingByRoute = true;
-  
-  // Logic: If jump is > 2 pages (more than 1 spread), separate logic?
-  // Current: p1(0), p2+3(1), p4+5(2)
-  // Actually page indices: 0 (cover), 1,2,3...
-  
-  const diff = Math.abs(targetPage - currentPage);
+  isFlippingFromRoute = true;
   
   try {
-     if (diff > 2) {
-       // "Jump" - use turnToPage for instant or cleaner transition
-       // Wait, user wants "animation is played with the main page as background".
-       // This implies they WANT the flip, but WITHOUT intermediate pages showing up ghost-like.
-       // simple-page-flip doesn't support "skip rendering intermediate" easily.
-       // Try: turnToPage (instant) -> then flip last step? 
-       // If I am at 1. Go to 5.
-       // If I turnToPage(3), it shows 3.
-       // Maybe best bet: Just let it flip but fast? Or accept standard behavior.
-       // User says: "immediately showing the previous page of the one selected"
-       // This implies: "I clicked 'Code Repo' (p5). I see 'Digital Garden' (p3) briefly."
-       // Correct logic: If I jump 1 -> 5. 1 flips to 2/3. 3 flips to 4/5. 
-       // User wants 1 -> [Flip Effect] -> 5.
-       // Library doesn't support skipping spreads in a single flip.
-       // Forced Workaround: 
-       // 1. turnToPage(targetPage - 2) (Instant jump to one-before)
-       // 2. flip(targetPage) (Animate last step)
-       // This makes it look like 1 "Step" transition.
-       
-       if (targetPage > currentPage) {
-           // Going forward. e.g. 1 -> 5.
-           // Jump to 3 (target - 2).
-           // Then flip to 5.
-           // However, if target is just next spread (diff <= 2), normal flip.
-           const jumpTo = targetPage - 2;
-           if (jumpTo > currentPage) {
-             pageFlipInstance.turnToPage(jumpTo); // Instant
-             setTimeout(() => {
-                 pageFlipInstance.flip(targetPage);
-             }, 50); // Small tick
-             return;
-           }
-       } else {
-           // Going back. e.g. 5 -> 1.
-           // Jump to 3 (target + 2).
-           const jumpTo = targetPage + 2;
-           if (jumpTo < currentPage) {
-               pageFlipInstance.turnToPage(jumpTo);
-               setTimeout(() => {
-                 pageFlipInstance.flip(targetPage);
-               }, 50);
-               return;
-           }
-       }
-     }
-     
-     pageFlipInstance.flip(targetPage);
+    // flip() animates from current to target. 
+    // If the target is far away, page-flip handles the transition.
+    pageFlipInstance.flip(targetPage);
   } catch (err) {
     console.error("Flip error", err);
+    isFlippingFromRoute = false;
   }
 });
 </script>

@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "flipbook-vue": "^1.0.0-beta.4",
     "nuxt": "^4.3.1",
     "page-flip": "^2.0.7",
     "vue": "^3.5.28",

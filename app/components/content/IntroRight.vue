@@ -7,7 +7,15 @@
     </div>
 
     <nav class="space-y-10 flex-grow pr-4">
-      <NuxtLink v-for="(item, index) in navItems" :key="index" :to="item.link" class="group flex items-end gap-6 hover:translate-x-1 transition-transform duration-300">
+      <NuxtLink 
+        v-for="(item, index) in navItems" 
+        :key="index" 
+        :to="item.link" 
+        class="group flex items-end gap-6 hover:translate-x-1 transition-transform duration-300"
+        @click.stop
+        @mousedown.stop
+        @touchstart.stop
+      >
         <span class="font-heading text-2xl text-accent-orange/60 group-hover:text-accent-orange transition-colors duration-300">{{ '0' + (index + 1) + '.' }}</span>
         <div class="flex-1 pb-1 border-b-2 border-leather-brown/10 dark:border-white/10 group-hover:border-accent-orange/30 transition-colors duration-300 flex justify-between items-end">
           <h3 class="font-heading text-2xl text-leather-brown dark:text-orange-50/80 group-hover:text-accent-orange transition-colors duration-300">{{ item.title }}</h3>
