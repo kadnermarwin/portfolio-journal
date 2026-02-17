@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
   app: {
+    pageTransition: { name: 'page' },
     head: {
       title: 'Warm Journal Home Page',
       link: [
@@ -28,4 +29,5 @@ export default defineNuxtConfig({
       ]
     }
   }
+
 })
