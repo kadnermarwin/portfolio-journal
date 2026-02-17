@@ -25,25 +25,27 @@ let isFlippingByRoute = false; // Flag to prevent circular updates
 // Page 3-4: Spread 2 (Route: /read/2)
 // ...
 const getPageIndexFromRoute = () => {
-  if (route.path === '/' || route.path === '/book') return 0;
+  // If we are at root, we want to show the Intro spread (Pages 1 & 2)
+  if (route.path === '/' || route.path === '/book') return 1;
   const spreadParam = route.params.spread;
-  if (!spreadParam) return 0;
+  if (!spreadParam) return 1; // Default to Intro if invalid
   
   const spreadId = parseInt(Array.isArray(spreadParam) ? spreadParam[0] : spreadParam);
-  if (isNaN(spreadId)) return 0;
+  if (isNaN(spreadId)) return 1;
 
-  // Spread 1 starts at Page 1 (0 is cover)
-  // Logic: Spread 1 -> Page 1 (actually view shows 1 & 2)
-  // Spread 2 -> Page 3
-  // Spread N -> Page (N-1)*2 + 1
+  // Spread 1 (Intro) -> Page 1
+  // Spread 2 (Garden) -> Page 3
+  // Formula: (Spread - 1) * 2 + 1
   return (spreadId - 1) * 2 + 1;
 };
 
 const getRouteFromPageIndex = (pageIndex) => {
-  if (pageIndex === 0) return '/';
-  // Page 1 or 2 -> Spread 1
-  // Page 3 or 4 -> Spread 2
-  // Formula: floor((Page - 1) / 2) + 1
+  if (pageIndex === 0) return '/?cover=true'; // Optional: explicit cover url or just '/'
+  
+  // Page 1, 2 -> Spread 1 -> '/'
+  if (pageIndex === 1 || pageIndex === 2) return '/';
+  
+  // Page 3, 4 -> Spread 2 -> '/read/2'
   const spreadId = Math.floor((pageIndex - 1) / 2) + 1;
   return `/read/${spreadId}`;
 };
@@ -69,7 +71,11 @@ onMounted(async () => {
       flippingTime: 1000,
       usePortrait: false, // Attempt to force landscape/spread
       startPage: startPage, // Start at correct page based on URL
-      mobileScrollSupport: true 
+      mobileScrollSupport: true,
+      showHover: false, // Disable dynamic corner peel
+      showPageCorners: false, // Helper to hide corners visual
+      clickEventForward: false, // Prevent default click on invalid areas
+      useMouseEvents: true // Needed for drag, but we want to kill hover
     });
 
     const pages = bookRef.value.querySelectorAll('.page-content');
@@ -99,15 +105,68 @@ watch(() => route.fullPath, () => {
   
   // Check if we are already seeing this page (or its spread partner)
   const currentOrient = pageFlipInstance.getOrientation(); // 'landscape' or 'portrait'
-  // Actually pageFlipInstance.getCurrentPageIndex() gives the specific page index
-  // Note: specific implementation detail of page-flip: 
-  // In landscape, flipping to 1 or 2 results in the same "view".
+  const currentPage = pageFlipInstance.getCurrentPageIndex();
+
+  // If already close enough (spread view), skip
+  if (currentPage === targetPage || (currentPage + 1 === targetPage && currentPage % 2 === 1)) {
+     return;
+  }
   
-  // Just try to flip to it.
-  // We set a flag to tell the flip handler "this is intentional from route, don't push again"
-  // (Though pushing same route is usually harmless/ignored by router)
   isFlippingByRoute = true;
+  
+  // Logic: If jump is > 2 pages (more than 1 spread), separate logic?
+  // Current: p1(0), p2+3(1), p4+5(2)
+  // Actually page indices: 0 (cover), 1,2,3...
+  
+  const diff = Math.abs(targetPage - currentPage);
+  
   try {
+     if (diff > 2) {
+       // "Jump" - use turnToPage for instant or cleaner transition
+       // Wait, user wants "animation is played with the main page as background".
+       // This implies they WANT the flip, but WITHOUT intermediate pages showing up ghost-like.
+       // simple-page-flip doesn't support "skip rendering intermediate" easily.
+       // Try: turnToPage (instant) -> then flip last step? 
+       // If I am at 1. Go to 5.
+       // If I turnToPage(3), it shows 3.
+       // Maybe best bet: Just let it flip but fast? Or accept standard behavior.
+       // User says: "immediately showing the previous page of the one selected"
+       // This implies: "I clicked 'Code Repo' (p5). I see 'Digital Garden' (p3) briefly."
+       // Correct logic: If I jump 1 -> 5. 1 flips to 2/3. 3 flips to 4/5. 
+       // User wants 1 -> [Flip Effect] -> 5.
+       // Library doesn't support skipping spreads in a single flip.
+       // Forced Workaround: 
+       // 1. turnToPage(targetPage - 2) (Instant jump to one-before)
+       // 2. flip(targetPage) (Animate last step)
+       // This makes it look like 1 "Step" transition.
+       
+       if (targetPage > currentPage) {
+           // Going forward. e.g. 1 -> 5.
+           // Jump to 3 (target - 2).
+           // Then flip to 5.
+           // However, if target is just next spread (diff <= 2), normal flip.
+           const jumpTo = targetPage - 2;
+           if (jumpTo > currentPage) {
+             pageFlipInstance.turnToPage(jumpTo); // Instant
+             setTimeout(() => {
+                 pageFlipInstance.flip(targetPage);
+             }, 50); // Small tick
+             return;
+           }
+       } else {
+           // Going back. e.g. 5 -> 1.
+           // Jump to 3 (target + 2).
+           const jumpTo = targetPage + 2;
+           if (jumpTo < currentPage) {
+               pageFlipInstance.turnToPage(jumpTo);
+               setTimeout(() => {
+                 pageFlipInstance.flip(targetPage);
+               }, 50);
+               return;
+           }
+       }
+     }
+     
      pageFlipInstance.flip(targetPage);
   } catch (err) {
     console.error("Flip error", err);
@@ -121,54 +180,19 @@ watch(() => route.fullPath, () => {
     <div class="book-wrapper">
       
       <!-- SVG SPIRAL BINDING (Centered) -->
-      <div class="hidden md:flex w-12 md:w-20 absolute left-1/2 top-0 bottom-0 -translate-x-1/2 z-50 pointer-events-none select-none py-6 flex-col justify-evenly">
-        <div v-for="i in 14" :key="i" class="relative h-20 w-full flex items-center justify-center">
-          <!-- Left Hole -->
-          <div class="absolute left-[20%] w-3 h-3 rounded-full bg-[#1a1814]/20 dark:bg-black/40 shadow-[inset_0_1px_2px_rgba(0,0,0,0.6)] transition-colors duration-300"></div>
-          <!-- Right Hole -->
-          <div class="absolute right-[20%] w-3 h-3 rounded-full bg-[#1a1814]/20 dark:bg-black/40 shadow-[inset_0_1px_2px_rgba(0,0,0,0.6)] transition-colors duration-300"></div>
-          
-          <!-- Spiral SVG -->
-          <svg class="absolute w-[160%] h-full overflow-visible z-10" viewBox="0 0 100 60" preserveAspectRatio="none">
-            <defs>
-              <linearGradient :id="'bind-grad-' + i" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#555" class="dark:stop-color-[#333] transition-colors duration-300" />
-                <stop offset="30%" stop-color="#bbb" class="dark:stop-color-[#777] transition-colors duration-300" />
-                <stop offset="50%" stop-color="#eee" class="dark:stop-color-[#aaa] transition-colors duration-300" />
-                <stop offset="70%" stop-color="#bbb" class="dark:stop-color-[#777] transition-colors duration-300" />
-                <stop offset="100%" stop-color="#555" class="dark:stop-color-[#333] transition-colors duration-300" />
-              </linearGradient>
-              <filter :id="'shadow-' + i" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="2" dy="3" stdDeviation="1.5" flood-color="rgba(0,0,0,0.3)" class="dark:flood-color-[rgba(0,0,0,0.7)]"/>
-              </filter>
-            </defs>
-            
-            <path 
-              d="M 15 28 C 15 -10 85 -10 85 28" 
-              :stroke="'url(#bind-grad-' + i + ')'" 
-              stroke-width="6" 
-              fill="none" 
-              stroke-linecap="round"
-              :filter="'url(#shadow-' + i + ')'"
-            />
-            <path 
-              d="M 15 28 C 15 50 20 60 25 60" 
-              stroke="#777" 
-              class="dark:stroke-[#444] opacity-60 transition-colors duration-300"
-              stroke-width="5" 
-              fill="none" 
-              stroke-linecap="round"
-            />
-              <path 
-              d="M 75 60 C 80 60 85 50 85 28" 
-              stroke="#777" 
-              class="dark:stroke-[#444] opacity-60 transition-colors duration-300"
-              stroke-width="5" 
-              fill="none" 
-              stroke-linecap="round"
-            />
-          </svg>
-        </div>
+      <!-- LEATHER CORDS BINDING -->
+      <div class="hidden md:flex w-16 absolute left-1/2 top-0 bottom-0 -translate-x-1/2 z-50 pointer-events-none select-none flex-col justify-evenly py-10">
+         <div v-for="i in 3" :key="i" class="relative w-full h-8 flex items-center justify-center">
+             <!-- The Cord -->
+             <div class="w-[120%] h-2 bg-[#3e2723] rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.4)] relative z-10 flex items-center justify-center">
+                 <!-- Knot/Stitch Detail -->
+                 <div class="w-8 h-3 bg-[#271c19] rounded-sm absolute left-1/2 -translate-x-1/2 shadow-inner"></div>
+                 <div class="w-full h-[1px] bg-white/10 absolute top-[1px]"></div>
+             </div>
+             <!-- Holes on pages -->
+             <div class="absolute left-0 w-3 h-3 rounded-full bg-[#1a1814]/30 shadow-inner translate-x-1"></div>
+             <div class="absolute right-0 w-3 h-3 rounded-full bg-[#1a1814]/30 shadow-inner -translate-x-1"></div>
+         </div>
       </div>
 
       <div ref="bookRef" class="flip-book">
@@ -286,6 +310,16 @@ watch(() => route.fullPath, () => {
 }
 :global(.dark) .page-content {
   background-color: #2a2824;
+}
+
+
+/* Override page-flip hover effects forcefully */
+/* Note: .stf__block is the PAGE wrapper in some versions, do not hide it! */
+:global(.stf__item.-hover) {
+  /* Prevent the "peel" transform if possible */
+  /* If this hides the page on hover, we might need to be more specific. 
+     But for now, removing the filter usually just stops the shadow/highlight. */
+  filter: none !important;
 }
 
 .cover {

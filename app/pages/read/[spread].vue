@@ -1,14 +1,9 @@
 <template>
-  <div>
-    <ClientOnly>
-      <InteractiveBook />
-    </ClientOnly>
-  </div>
+  <!-- Rendered by layout -->
+  <div></div>
 </template>
 
 <script setup lang="ts">
-import InteractiveBook from '~/components/InteractiveBook.vue'
-
 // The InteractiveBook component basically handles everything based on the route.
 // We just need to ensure this page renders it.
 definePageMeta({

@@ -1,14 +1,9 @@
 <template>
-  <div>
-    <ClientOnly>
-      <InteractiveBook />
-    </ClientOnly>
-  </div>
+  <!-- Rendered by layout -->
+  <div></div>
 </template>
 
 <script setup lang="ts">
-import InteractiveBook from '~/components/InteractiveBook.vue'
-
 definePageMeta({
   layout: 'default',
   key: 'book-view' 
