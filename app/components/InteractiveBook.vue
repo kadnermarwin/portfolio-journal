@@ -1,16 +1,11 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import IntroLeft from '~/components/content/IntroLeft.vue'
-import IntroRight from '~/components/content/IntroRight.vue'
-import GardenLeft from '~/components/content/GardenLeft.vue'
-import GardenRight from '~/components/content/GardenRight.vue'
-import ProjectsLeft from '~/components/content/ProjectsLeft.vue'
-import ProjectsRight from '~/components/content/ProjectsRight.vue'
-import CvLeft from '~/components/content/CvLeft.vue'
-import CvRight from '~/components/content/CvRight.vue'
-import PhotosLeft from '~/components/content/PhotosLeft.vue'
-import PhotosRight from '~/components/content/PhotosRight.vue'
+import Intro from '~/components/content/Intro.vue'
+import Garden from '~/components/content/Garden.vue'
+import Projects from '~/components/content/Projects.vue'
+import Cv from '~/components/content/Cv.vue'
+import Photos from '~/components/content/Photos.vue'
 import BookPage from '~/components/BookPage.vue'
 
 const bookRef = ref(null);
@@ -173,60 +168,56 @@ watch(() => route.fullPath, () => {
         <!-- Note: page-flip considers these pages 1 & 2 -->
         <div class="page-content">
              <BookPage class="h-full">
-                 <IntroLeft />
+                 <Intro side="left" />
              </BookPage>
         </div>
         <div class="page-content">
           <BookPage class="h-full">
-            <IntroRight />
+            <Intro side="right" />
           </BookPage>
         </div>
         
-        <!-- SPREAD 2: GARDEN -->
         <div class="page-content">
           <BookPage class="h-full">
-            <GardenLeft />
+            <Garden side="left" />
           </BookPage>
         </div>
         <div class="page-content">
           <BookPage class="h-full">
-            <GardenRight />
-          </BookPage>
-        </div>
-
-        <!-- SPREAD 3: PROJECTS -->
-        <div class="page-content">
-          <BookPage class="h-full">
-            <ProjectsLeft />
-          </BookPage>
-        </div>
-        <div class="page-content">
-          <BookPage class="h-full">
-            <ProjectsRight />
+            <Garden side="right" />
           </BookPage>
         </div>
 
-        <!-- SPREAD 4: CV -->
         <div class="page-content">
           <BookPage class="h-full">
-             <CvLeft />
+            <Projects side="left" />
           </BookPage>
         </div>
         <div class="page-content">
           <BookPage class="h-full">
-             <CvRight />
+            <Projects side="right" />
           </BookPage>
         </div>
 
-         <!-- SPREAD 5: PHOTOS -->
         <div class="page-content">
           <BookPage class="h-full">
-             <PhotosLeft />
+             <Cv side="left" />
           </BookPage>
         </div>
         <div class="page-content">
           <BookPage class="h-full">
-             <PhotosRight />
+             <Cv side="right" />
+          </BookPage>
+        </div>
+
+        <div class="page-content">
+          <BookPage class="h-full">
+             <Photos side="left" />
+          </BookPage>
+        </div>
+        <div class="page-content">
+          <BookPage class="h-full">
+             <Photos side="right" />
           </BookPage>
         </div>
 
