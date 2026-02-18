@@ -11,6 +11,8 @@ import BookPage from '~/components/BookPage.vue'
 const bookRef = ref(null);
 const route = useRoute();
 const router = useRouter();
+const currentPage = ref(0);
+const totalPages = ref(0);
 let pageFlipInstance = null;
 let isFlippingFromRoute = false; 
 
@@ -49,11 +51,18 @@ onMounted(async () => {
 
   if (bookRef.value) {
     const startPage = getPageIndexFromRoute();
+    const containerWidth = bookRef.value.clientWidth;
+    // Use 98dvh for calculation to match CSS
+    const containerHeight = window.innerHeight * 0.98;
+    
+    // Calculate page dimensions to fit exactly (half width since it's a spread)
+    const pageWidth = containerWidth / 2;
+    const pageHeight = containerHeight;
 
     pageFlipInstance = new PageFlip(bookRef.value, {
-      width: 550,
-      height: 733,
-      size: "stretch",
+      width: pageWidth, // Base width for aspect ratio
+      height: pageHeight, // Base height for aspect ratio
+      size: "stretch", // Stretch to container
       minWidth: 300,
       maxWidth: 2000,
       minHeight: 400,
@@ -68,9 +77,32 @@ onMounted(async () => {
       showHover: false,
       showPageCorners: false,
       clickEventForward: false,
-      useMouseEvents: true,
+      useMouseEvents: false,
       swipeDistance: 30,
       startZIndex: 0
+    });
+
+    // EVENT: State Change -> Manage Z-Index
+    let zIndexTimer = null;
+    pageFlipInstance.on('changeState', (e) => {
+      if (bookRef.value) {
+        // Always reset timer on state change to prevent race conditions
+        if (zIndexTimer) clearTimeout(zIndexTimer);
+
+        if (e.data === 'flipping') {
+          // Add class ONLY when page reaches roughly the middle (half of flippingTime 800ms)
+          // This allows binding cords to stay visible for the first half of the arc.
+          zIndexTimer = setTimeout(() => {
+            bookRef.value?.classList.add('is-animating');
+          }, 350);
+        } else if (e.data === 'user_fold') {
+          // While dragging manually, keep cords visible (do NOT add class)
+          bookRef.value.classList.remove('is-animating');
+        } else if (e.data === 'read') {
+          // Reset when finished
+          bookRef.value.classList.remove('is-animating');
+        }
+      }
     });
 
     const pages = bookRef.value.querySelectorAll('.page-content');
@@ -79,6 +111,7 @@ onMounted(async () => {
     // EVENT: Flip -> Update Route
     pageFlipInstance.on('flip', (e) => {
       const newPageIndex = e.data;
+      currentPage.value = newPageIndex;
       const newPath = getRouteFromPageIndex(newPageIndex);
       
       if (route.path !== newPath) {
@@ -89,8 +122,20 @@ onMounted(async () => {
       }
       isFlippingFromRoute = false;
     });
+
+    // Initialize state
+    totalPages.value = pageFlipInstance.getPageCount();
+    currentPage.value = startPage;
   }
 });
+
+const nextPage = () => {
+  if (pageFlipInstance) pageFlipInstance.flipNext();
+};
+
+const prevPage = () => {
+  if (pageFlipInstance) pageFlipInstance.flipPrev();
+};
 
 onBeforeUnmount(() => {
   if (pageFlipInstance) {
@@ -149,82 +194,170 @@ watch(() => route.fullPath, () => {
                  <div class="w-full h-[1px] bg-white/10 absolute top-[1px]"></div>
              </div>
              <!-- Holes on pages -->
-             <div class="absolute left-0 w-3 h-3 rounded-full bg-[#1a1814]/30 shadow-inner translate-x-1"></div>
              <div class="absolute right-0 w-3 h-3 rounded-full bg-[#1a1814]/30 shadow-inner -translate-x-1"></div>
          </div>
       </div>
+
+
 
       <div ref="bookRef" class="flip-book">
         
         <!-- COVER PAGE (Right side when closed, but effectively Page 0) -->
         <div class="page-content cover">
-             <div class="h-full flex flex-col justify-center items-center bg-leather-brown text-white p-10 border-4 border-[#5a2c0c] shadow-inner">
+             <div class="h-full flex flex-col justify-center items-center bg-leather-brown text-white p-10 border-4 border-[#5a2c0c] shadow-inner relative group">
                 <h1 class="text-6xl font-heading mb-4 text-center">Marwin's<br>Logbook</h1>
-                <p class="text-xl opacity-80">Click to Open</p>
+                <p class="text-xl opacity-80 group-hover:scale-110 transition-transform duration-300">Click to Open</p>
+                
+                <!-- NEXT (Cover) -->
+                <button 
+                  @click.stop="nextPage"
+                  class="absolute right-4 top-4 transition-all hover:scale-110 active:scale-95 text-[#e6dcc3] hover:text-white font-heading text-2xl rotate-2 opacity-80 hover:opacity-100"
+                  title="Open Book"
+                >
+                  Open →
+                </button>
              </div>
         </div>
 
         <!-- SPREAD 1: INTRO (Left & Right) -->
         <!-- Note: page-flip considers these pages 1 & 2 -->
         <div class="page-content">
-             <BookPage class="h-full">
+             <BookPage class="h-full relative">
                  <Intro side="left" />
+                 <button 
+                    @click.stop="prevPage"
+                    class="absolute left-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 -rotate-2"
+                    title="Previous"
+                 >
+                   ← Back
+                 </button>
              </BookPage>
         </div>
         <div class="page-content">
-          <BookPage class="h-full">
+          <BookPage class="h-full relative">
             <Intro side="right" />
+            <button 
+               @click.stop="nextPage"
+               class="absolute right-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 rotate-2"
+               title="Next"
+            >
+              Next →
+            </button>
           </BookPage>
         </div>
         
         <div class="page-content">
-          <BookPage class="h-full">
+          <BookPage class="h-full relative">
             <Garden side="left" />
+            <button 
+               @click.stop="prevPage"
+               class="absolute left-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 -rotate-2"
+               title="Previous"
+            >
+              ← Back
+            </button>
           </BookPage>
         </div>
         <div class="page-content">
-          <BookPage class="h-full">
+          <BookPage class="h-full relative">
             <Garden side="right" />
+             <button 
+               @click.stop="nextPage"
+               class="absolute right-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 rotate-2"
+               title="Next"
+            >
+              Next →
+            </button>
           </BookPage>
         </div>
 
         <div class="page-content">
-          <BookPage class="h-full">
+          <BookPage class="h-full relative">
             <Projects side="left" />
+             <button 
+               @click.stop="prevPage"
+               class="absolute left-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 -rotate-2"
+               title="Previous"
+            >
+              ← Back
+            </button>
           </BookPage>
         </div>
         <div class="page-content">
-          <BookPage class="h-full">
+          <BookPage class="h-full relative">
             <Projects side="right" />
+             <button 
+               @click.stop="nextPage"
+               class="absolute right-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 rotate-2"
+               title="Next"
+            >
+              Next →
+            </button>
           </BookPage>
         </div>
 
         <div class="page-content">
-          <BookPage class="h-full">
+          <BookPage class="h-full relative">
              <Cv side="left" />
+             <button 
+               @click.stop="prevPage"
+               class="absolute left-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 -rotate-2"
+               title="Previous"
+            >
+              ← Back
+            </button>
           </BookPage>
         </div>
         <div class="page-content">
-          <BookPage class="h-full">
+          <BookPage class="h-full relative">
              <Cv side="right" />
+             <button 
+               @click.stop="nextPage"
+               class="absolute right-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 rotate-2"
+               title="Next"
+            >
+              Next →
+            </button>
           </BookPage>
         </div>
 
         <div class="page-content">
-          <BookPage class="h-full">
+          <BookPage class="h-full relative">
              <Photos side="left" />
+             <button 
+               @click.stop="prevPage"
+               class="absolute left-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 -rotate-2"
+               title="Previous"
+            >
+              ← Back
+            </button>
           </BookPage>
         </div>
         <div class="page-content">
-          <BookPage class="h-full">
+          <BookPage class="h-full relative">
              <Photos side="right" />
+             <!-- No Next button here because the next page is the back cover -->
+             <button 
+               @click.stop="nextPage"
+               class="absolute right-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 rotate-2"
+               title="Next"
+            >
+              Next →
+            </button>
           </BookPage>
         </div>
 
         <!-- BACK COVER -->
         <div class="page-content cover">
-             <div class="h-full flex justify-center items-center bg-leather-brown text-white p-10 border-4 border-[#5a2c0c]">
+             <div class="h-full flex justify-center items-center bg-leather-brown text-white p-10 border-4 border-[#5a2c0c] relative">
                 <h2 class="text-3xl font-heading">The End</h2>
+                <button 
+                  @click.stop="prevPage"
+                  class="absolute left-4 top-4 transition-all hover:scale-110 active:scale-95 text-[#e6dcc3] hover:text-white font-heading text-2xl -rotate-2 opacity-80 hover:opacity-100"
+                  title="Previous Page"
+                >
+                  ← Back
+                </button>
              </div>
         </div>
 
@@ -248,12 +381,15 @@ watch(() => route.fullPath, () => {
 
 .book-wrapper {
   position: relative;
-  /* Logic: scale until we hit max-width OR max-height, keeping aspect ratio */
-  width: 100vw;
-  height: auto;
-  aspect-ratio: 1.5; /* 2 pages wide roughly */
-  max-height: 100vh; /* Don't get too tall */
+  /* Allow full width stretching */
+  width: 100%;
+  height: 98dvh; /* Use dynamic viewport height with a small buffer */
   margin: auto;
+  
+  /* Fallback constraints just in case */
+  max-width: 100%;
+  /* Optional: max-height if you don't want it taller than screen */
+  max-height: 100vh;
 }
 /* If the screen is very wide but short (height constrained), the max-height above works but width might shrink too */
 /* If the screen is narrow (width constrained), 95vw kicks in and height adjusts automatically due to aspect-ratio */
@@ -280,4 +416,14 @@ watch(() => route.fullPath, () => {
 .cover {
   background-color: #8b4513;
 }
+
+/* When flipping, we boost the z-index of the flip-book container.
+   This ensures that while a page is 'in the air', it doesn't 
+   clash with the spiral binding or other absolute elements.
+*/
+.flip-book.is-animating {
+  z-index: 50 !important;
+}
+
+
 </style>

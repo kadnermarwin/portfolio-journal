@@ -1,5 +1,5 @@
 <template>
-  <section class="flex-1 min-h-[650px] p-8 md:py-14 md:pl-14 md:pr-16 relative dot-grid dark:dot-grid-dark transition-colors duration-500">
+  <section class="flex-1 h-full overflow-y-auto p-8 md:py-14 md:pl-14 md:pr-16 relative dot-grid dark:dot-grid-dark transition-colors duration-500">
     <slot />
   </section>
 </template>
