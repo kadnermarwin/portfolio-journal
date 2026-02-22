@@ -23,6 +23,9 @@ let isFlippingFromRoute = false;
 // Page 3-4: Spread 2 (Route: /read/2)
 // ...
 const getPageIndexFromRoute = () => {
+  // Ignore non-book routes
+  if (route.path !== '/' && route.path !== '/book' && !route.path.startsWith('/read')) return 0;
+
   // Root -> Cover (Page 0)
   if (route.path === '/' || route.path === '/book') return 0;
   const spreadParam = route.params.spread;
@@ -176,11 +179,7 @@ watch(() => route.fullPath, () => {
 
   // CRITICAL: Check if an animation is already in progress
   const state = pageFlipInstance.getState();
-  if (state !== 'read') {
-    // If we are already flipping, targetPage will eventually be reached or 
-    // we should wait for the current one to finish. 
-    // However, if the user clicked a TOC link, we want to OVERRIDE if possible
-    // or at least not start a concurrent animation that glitches.
+  if (state !== 'read' && targetPage === current) {
     return;
   }
   
@@ -213,26 +212,11 @@ const isClosed = computed(() => isFrontCoverClosed.value || isBackCoverClosed.va
 </script>
 
 <template>
-  <div class="book-environment" :class="{ 'is-closed': isClosed }">
+  <div class="book-environment pointer-events-none" :class="{ 'is-closed': isClosed }">
     
-    <!-- Desk Background (fades in when closed) -->
-    <div class="desk-surface"></div>
-    
-    <!-- Laptop (Top-down view) -->
-    <div class="laptop-item">
-      <!-- Simple CSS Laptop -->
-      <div class="macbook-screen"></div>
-      <div class="macbook-base">
-        <div class="macbook-keyboard">
-          <div class="keyboard-inner"></div>
-        </div>
-        <div class="macbook-trackpad"></div>
-      </div>
-    </div>
-
     <!-- The Notebook itself -->
-    <div class="book-container" :class="{ 'is-closed': isClosed, 'front-cover': isFrontCoverClosed, 'back-cover': isBackCoverClosed }">
-      <div class="book-wrapper">
+    <div class="book-container pointer-events-none" :class="{ 'is-closed': isClosed, 'front-cover': isFrontCoverClosed, 'back-cover': isBackCoverClosed }">
+      <div class="book-wrapper pointer-events-none">
         
         <!-- SVG SPIRAL BINDING (Centered) -->
         <!-- LEATHER CORDS BINDING -->
@@ -249,7 +233,7 @@ const isClosed = computed(() => isFrontCoverClosed.value || isBackCoverClosed.va
            </div>
         </div>
 
-        <div ref="bookRef" class="flip-book">
+        <div ref="bookRef" class="flip-book pointer-events-auto shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-300" :class="{ 'hover:scale-[1.02] cursor-pointer': isFrontCoverClosed, 'hover:scale-[1.02]': isBackCoverClosed }" @click="isFrontCoverClosed && nextPage()">
           
           <!-- COVER PAGE (Right side when closed, but effectively Page 0) -->
           <div class="page-content cover">
@@ -422,18 +406,14 @@ const isClosed = computed(() => isFrontCoverClosed.value || isBackCoverClosed.va
   min-height: 100vh;
   position: relative;
   overflow: hidden;
-  /* Active reading background */
-  background-color: #fdfaf4; 
-  transition: background-color 1s ease-in-out;
-}
-:global(.dark) .book-environment {
-  background-color: #1a1814;
+  background-color: transparent; 
 }
 
 /* Container defining standard book positioning and zooming */
 .book-container {
   position: relative;
   z-index: 2;
+  /* the width and height will be determined by its parent wrapper (.book-wrapper in TableView) */
   width: 100%;
   height: 100%;
   display: flex;
@@ -441,6 +421,11 @@ const isClosed = computed(() => isFrontCoverClosed.value || isBackCoverClosed.va
   align-items: center;
   transition: all 1s cubic-bezier(0.25, 1, 0.5, 1);
   transform-origin: center center;
+  /* Prevent pointer events on the container itself so we don't block clicks on the table, only the wrapper contents */
+  pointer-events: none;
+}
+.book-container > * {
+  pointer-events: auto;
 }
 
 /* When closed, the book scales down but stays in the center */
@@ -460,11 +445,6 @@ const isClosed = computed(() => isFrontCoverClosed.value || isBackCoverClosed.va
   }
   .book-container.is-closed.back-cover {
     transform: scale(0.6) translateX(50%) rotate(2deg);
-  }
-  .book-environment.is-closed .laptop-item {
-    left: 15%;
-    top: 25%;
-    transform: translate(-50%, -50%) scale(0.7) rotate(-2deg);
   }
 }
 
@@ -513,112 +493,5 @@ const isClosed = computed(() => isFrontCoverClosed.value || isBackCoverClosed.va
   z-index: 50 !important;
 }
 
-/* Desk Surface */
-.desk-surface {
-  position: absolute;
-  inset: 0;
-  /* An elegant warm dark wood pattern or solid color for the desk */
-  background: radial-gradient(circle at center, #4e342e 0%, #2e1d18 100%);
-  opacity: 0;
-  transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1);
-  pointer-events: none;
-  z-index: 0;
-}
-:global(.dark) .desk-surface {
-  background: radial-gradient(circle at center, #2e1d18 0%, #150d0b 100%);
-}
-.book-environment.is-closed .desk-surface {
-  opacity: 1;
-}
 
-/* Laptop Styling */
-.laptop-item {
-  position: absolute;
-  left: -20%;
-  top: 50%;
-  transform: translate(-50%, -50%) scale(0.8) rotate(-10deg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  opacity: 0;
-  transition: all 1s cubic-bezier(0.25, 1, 0.5, 1);
-  pointer-events: none;
-  z-index: 1;
-}
-.book-environment.is-closed .laptop-item {
-  /* Move laptop to the left edge when closed to account for centered book */
-  left: 10%;
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(0.9) rotate(-5deg);
-}
-
-.macbook-screen {
-  width: 380px;
-  height: 24px;
-  background: linear-gradient(to right, #000 0%, #222 50%, #000 100%);
-  border-radius: 12px 12px 0 0;
-  box-shadow: inset 0 2px 5px rgba(255,255,255,0.1), 0 -5px 15px rgba(0,0,0,0.5);
-  margin-bottom: -2px;
-  z-index: 1;
-  border-top: 1px solid #4df;
-}
-
-.macbook-base {
-  width: 400px;
-  height: 280px;
-  background: #ccd0d5; /* Silver */
-  border-radius: 16px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.6);
-  position: relative;
-  z-index: 2;
-  border: 1px solid #aeb4bc;
-}
-:global(.dark) .macbook-base {
-  background: #373a3d; /* Space Gray */
-  box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 0 15px rgba(255,255,255,0.2);
-  border: 1px solid #222;
-}
-
-.macbook-keyboard {
-  width: 330px;
-  height: 140px;
-  background: #1c1c1e;
-  border-radius: 8px;
-  margin-bottom: 24px;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.2);
-  padding: 4px;
-  position: relative;
-}
-
-.keyboard-inner {
-  width: 100%;
-  height: 100%;
-  /* subtle key texture */
-  background-image: 
-    linear-gradient(90deg, transparent 94%, #111 6%),
-    linear-gradient(0deg, transparent 88%, #111 12%);
-  background-size: 22px 22px;
-  border-radius: 4px;
-}
-:global(.dark) .keyboard-inner {
-  background-image: 
-    linear-gradient(90deg, transparent 94%, #000 6%),
-    linear-gradient(0deg, transparent 88%, #000 12%);
-}
-
-.macbook-trackpad {
-  width: 120px;
-  height: 70px;
-  background: #b5b9bf;
-  border-radius: 8px;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.5);
-}
-:global(.dark) .macbook-trackpad {
-  background: #2d2f32;
-  box-shadow: inset 0 1px 4px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.1);
-}
 </style>

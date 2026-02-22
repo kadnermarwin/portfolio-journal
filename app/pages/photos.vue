@@ -1,9 +1,9 @@
 <script setup lang="ts">
-definePageMeta({
-  redirect: '/read/5'
-})
+// Handles Camera view
 </script>
 
 <template>
-  <div>Redirecting to Photos...</div>
+  <div class="photos-page">
+    <!-- Managed by TableView -->
+  </div>
 </template>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-definePageMeta({
-  redirect: '/read/3'
-})
+// Handles Laptop view
 </script>
 
 <template>
-  <div>Redirecting to Projects...</div>
+  <div class="projects-page">
+    <!-- Managed by TableView -->
+  </div>
 </template>
