@@ -9,11 +9,13 @@ const route = useRoute();
 const router = useRouter();
 
 // activeItem can be 'table', 'book', 'laptop', 'camera'
+const isBookClosed = ref(false);
+
 const activeItem = computed(() => {
   if (route.path === '/') return 'table';
-  if (route.path.startsWith('/read')) return 'book';
   if (route.path === '/projects') return 'laptop';
   if (route.path === '/photos') return 'camera';
+  if (route.path.startsWith('/read') && isBookClosed.value) return 'table';
   return 'book';
 });
 
@@ -127,7 +129,7 @@ const openItem = (item: string) => {
       >
         <!-- The InteractiveBook itself handles its own internal routing logic -->
         <!-- We removed the click handler here so it doesn't block clicks; we'll click the book directly -->
-        <InteractiveBook />
+        <InteractiveBook @update:closed="isBookClosed = $event" />
       </div>
 
     </div>

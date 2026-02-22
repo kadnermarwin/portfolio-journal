@@ -208,6 +208,10 @@ const isBackCoverClosed = computed(() => {
 
 const isClosed = computed(() => isFrontCoverClosed.value || isBackCoverClosed.value);
 
+const emit = defineEmits(['update:closed']);
+watch(isClosed, (val) => {
+  emit('update:closed', val);
+}, { immediate: true });
 
 </script>
 
@@ -233,7 +237,7 @@ const isClosed = computed(() => isFrontCoverClosed.value || isBackCoverClosed.va
            </div>
         </div>
 
-        <div ref="bookRef" class="flip-book pointer-events-auto shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-300" :class="{ 'hover:scale-[1.02] cursor-pointer': isFrontCoverClosed, 'hover:scale-[1.02]': isBackCoverClosed }" @click="isFrontCoverClosed && nextPage()">
+        <div ref="bookRef" class="flip-book pointer-events-auto shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-300" :class="{ 'hover:scale-[1.02] cursor-pointer': isClosed }" @click="isFrontCoverClosed ? nextPage() : (isBackCoverClosed ? prevPage() : null)">
           
           <!-- COVER PAGE (Right side when closed, but effectively Page 0) -->
           <div class="page-content cover">
@@ -430,21 +434,27 @@ const isClosed = computed(() => isFrontCoverClosed.value || isBackCoverClosed.va
 
 /* When closed, the book scales down but stays in the center */
 .book-container.is-closed.front-cover {
-  transform: scale(0.65) rotate(3deg);
+  transform: scale(0.65) translateX(-25%) rotate(3deg);
+}
+.book-container.is-closed.front-cover .flip-book {
+  clip-path: polygon(50% -10%, 110% -10%, 110% 110%, 50% 110%);
 }
 
 .book-container.is-closed.back-cover {
   /* Shift to the right by half the container width so the left-sided page sits exactly where the right-sided page sits */
-  transform: scale(0.65) translateX(50%) rotate(3deg);
+  transform: scale(0.65) translateX(25%) rotate(3deg);
+}
+.book-container.is-closed.back-cover .flip-book {
+  clip-path: polygon(-10% -10%, 50% -10%, 50% 110%, -10% 110%);
 }
 
 /* Media query to adjust for mobile/smaller screens where side-by-side might be tight */
 @media (max-width: 1024px) {
   .book-container.is-closed.front-cover {
-    transform: scale(0.6) rotate(2deg);
+    transform: scale(0.6) translateX(-25%) rotate(2deg);
   }
   .book-container.is-closed.back-cover {
-    transform: scale(0.6) translateX(50%) rotate(2deg);
+    transform: scale(0.6) translateX(25%) rotate(2deg);
   }
 }
 
