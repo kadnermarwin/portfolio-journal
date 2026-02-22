@@ -40,12 +40,42 @@ const openItem = (item: string) => {
     <!-- The transformable surface containing all items -->
     <div class="table-surface" :class="[`active-${activeItem}`]">
       
+      <!-- Decorations -->
+      <TransitionGroup name="fade-item">
+        <div v-show="activeItem === 'table'" key="plant" class="table-item decoration decoration-plant">
+          <div class="plant-pot">
+             <div class="plant-dirt"></div>
+             <div class="leaf leaf-1"></div>
+             <div class="leaf leaf-2"></div>
+             <div class="leaf leaf-3"></div>
+             <div class="leaf leaf-4"></div>
+             <div class="leaf leaf-5"></div>
+          </div>
+        </div>
+
+        <div v-show="activeItem === 'table'" key="coffee" class="table-item decoration decoration-coffee">
+          <div class="coffee-saucer"></div>
+          <div class="coffee-cup">
+            <div class="coffee-liquid"></div>
+            <div class="coffee-handle"></div>
+          </div>
+        </div>
+
+        <div v-show="activeItem === 'table'" key="pens" class="table-item decoration decoration-pens">
+          <div class="pen-1"></div>
+          <div class="pen-2"></div>
+          <div class="pencil"></div>
+        </div>
+      </TransitionGroup>
+
       <!-- Laptop -->
-      <div 
-        class="table-item laptop-wrapper" 
-        :class="{ 'interactable': activeItem === 'table', 'is-active': activeItem === 'laptop' }"
-        @click.stop="activeItem === 'table' && openItem('laptop')"
-      >
+      <Transition name="fade-item">
+        <div 
+          v-show="activeItem !== 'book'"
+          class="table-item laptop-wrapper" 
+          :class="{ 'interactable': activeItem === 'table', 'is-active': activeItem === 'laptop' }"
+          @click.stop="activeItem === 'table' && openItem('laptop')"
+        >
         <div class="laptop-item">
           <!-- The screen -->
           <div class="macbook-screen">
@@ -64,14 +94,17 @@ const openItem = (item: string) => {
             <div class="macbook-trackpad"></div>
           </div>
         </div>
-      </div>
+        </div>
+      </Transition>
 
       <!-- Camera -->
-      <div 
-        class="table-item camera-wrapper" 
-        :class="{ 'interactable': activeItem === 'table', 'is-active': activeItem === 'camera' }"
-        @click.stop="activeItem === 'table' && openItem('camera')"
-      >
+      <Transition name="fade-item">
+        <div 
+          v-show="activeItem !== 'book'"
+          class="table-item camera-wrapper" 
+          :class="{ 'interactable': activeItem === 'table', 'is-active': activeItem === 'camera' }"
+          @click.stop="activeItem === 'table' && openItem('camera')"
+        >
         <div class="camera-item">
           <div class="camera-body">
             <div class="camera-flash">
@@ -84,7 +117,8 @@ const openItem = (item: string) => {
             <div class="camera-grip"></div>
           </div>
         </div>
-      </div>
+        </div>
+      </Transition>
 
       <!-- Notebook -->
       <div 
@@ -165,17 +199,15 @@ const openItem = (item: string) => {
 }
 
 /* LAPTOP ACTIVE: scale heavily and shift to center the laptop */
-/* Laptop is at left 8vw, top 15vh. Center is 50vw, 50vh. 
-   Translation needed: TX = 42vw, TY = 35vh */
+/* Focus precisely on the macbook-screen. */
 .table-surface.active-laptop {
-  transform: translate(42vw, 35vh) scale(2.8);
+  transform: translate(133vw, calc(140vh + 490px)) scale(3.5);
 }
 
 /* CAMERA ACTIVE: scale heavily and shift to center camera */
-/* Camera is at left 90vw, top 15vh. Center is 50vw, 50vh.
-   Translation needed: TX = -40vw, TY = 35vh */
+/* Camera is at left 88vw, top 12vh. Center is 50vw, 50vh. */
 .table-surface.active-camera {
-  transform: translate(-40vw, 35vh) scale(3.5);
+  transform: translate(-133vw, 133vh) scale(3.5);
 }
 
 /* ITEM WRAPPERS */
@@ -211,7 +243,7 @@ const openItem = (item: string) => {
 
 /* When desk is active, scatter items slightly */
 .active-table .book-wrapper-table {
-  transform: translate(-50%, -50%) rotate(3deg);
+  transform: translate(-45%, -45%) rotate(3deg);
 }
 .active-laptop .book-wrapper-table {
   /* Book shouldn't overlap laptop while zoomed in */
@@ -226,8 +258,8 @@ const openItem = (item: string) => {
 /* LAPTOP WRAPPER */
 .laptop-wrapper {
   /* Position cleanly in top left corner */
-  left: 15vw;
-  top: 15vh;
+  left: 12vw;
+  top: 10vh;
   width: 400px;
   transform: translate(-50%, -50%) scale(0.85) rotate(-15deg);
   z-index: 10;
@@ -244,8 +276,8 @@ const openItem = (item: string) => {
 /* CAMERA WRAPPER */
 .camera-wrapper {
   /* Position cleanly in top right corner */
-  left: 85vw;
-  top: 18vh;
+  left: 88vw;
+  top: 12vh;
   width: 200px;
   transform: translate(-50%, -50%) rotate(25deg);
   z-index: 10;
@@ -508,5 +540,155 @@ const openItem = (item: string) => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.fade-item-enter-active,
+.fade-item-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-item-enter-from,
+.fade-item-leave-to {
+  opacity: 0;
+}
+
+/* ========================================= */
+/* DECORATIONS CSS */
+/* ========================================= */
+.decoration {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Plant */
+.decoration-plant {
+  right: 18vw;
+  top: 8vh;
+  width: 80px;
+  height: 80px;
+  transform: rotate(15deg);
+}
+.plant-pot {
+  width: 60px;
+  height: 60px;
+  background: #c17754;
+  border-radius: 50%;
+  position: relative;
+  box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3), 5px 15px 15px rgba(0,0,0,0.4);
+}
+.plant-dirt {
+  position: absolute;
+  inset: 8px;
+  background: #3e2723;
+  border-radius: 50%;
+}
+.leaf {
+  position: absolute;
+  background: #4caf50;
+  border-radius: 0 50% 0 50%;
+  box-shadow: inset -2px -2px 5px rgba(0,0,0,0.2);
+}
+.leaf-1 { width: 40px; height: 40px; top: -15px; left: -10px; transform: rotate(-20deg); }
+.leaf-2 { width: 50px; height: 50px; top: -20px; right: -15px; transform: rotate(40deg); background: #388e3c; }
+.leaf-3 { width: 45px; height: 45px; top: 10px; right: -25px; transform: rotate(90deg); }
+.leaf-4 { width: 35px; height: 35px; bottom: -10px; left: -10px; transform: rotate(-110deg); background: #2e7d32; }
+.leaf-5 { width: 55px; height: 55px; top: 5px; left: -30px; transform: rotate(-60deg); }
+
+/* Coffee Cup */
+.decoration-coffee {
+  left: 15vw;
+  bottom: 12vh;
+  width: 90px;
+  height: 90px;
+  transform: rotate(-30deg);
+}
+.coffee-saucer {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  background: #e0e0e0;
+  border-radius: 50%;
+  top: -10px;
+  left: -10px;
+  box-shadow: 2px 10px 15px rgba(0,0,0,0.3), inset -2px -2px 5px rgba(255,255,255,0.8);
+}
+.coffee-cup {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  background: #fdfdfd;
+  border-radius: 50%;
+  box-shadow: inset -3px -3px 10px rgba(0,0,0,0.1), 0 5px 10px rgba(0,0,0,0.2);
+}
+.coffee-liquid {
+  position: absolute;
+  inset: 6px;
+  background: #4e342e;
+  border-radius: 50%;
+  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
+  border: 4px solid #8d6e63;
+}
+.coffee-handle {
+  position: absolute;
+  width: 30px;
+  height: 20px;
+  border: 8px solid #fdfdfd;
+  border-radius: 15px;
+  right: -25px;
+  top: 30px;
+  box-shadow: 2px 5px 8px rgba(0,0,0,0.2);
+}
+
+/* Pens/Pencils */
+.decoration-pens {
+  right: 22vw;
+  bottom: 15vh;
+  width: 100px;
+  height: 100px;
+  transform: rotate(45deg);
+}
+.pen-1, .pen-2, .pencil {
+  position: absolute;
+  border-radius: 4px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+.pen-1 {
+  width: 120px;
+  height: 12px;
+  background: #111;
+  top: 20px;
+  left: -10px;
+  transform: rotate(-15deg);
+}
+.pen-1::before {
+  content: ''; position: absolute; left: -10px; top: 1px; width: 0; height: 0;
+  border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 10px solid #111;
+}
+.pen-2 {
+  width: 110px;
+  height: 14px;
+  background: #1565c0;
+  top: 40px;
+  left: 0;
+  transform: rotate(5deg);
+}
+.pen-2::before {
+  content: ''; position: absolute; left: -10px; top: 2px; width: 0; height: 0;
+  border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 10px solid #bdbdbd;
+}
+.pencil {
+  width: 100px;
+  height: 10px;
+  background: #fbc02d;
+  top: 60px;
+  left: 10px;
+  transform: rotate(-25deg);
+}
+.pencil::before {
+  content: ''; position: absolute; left: -12px; top: 0; width: 0; height: 0;
+  border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 12px solid #ffcc80;
+}
+.pencil::after {
+  content: ''; position: absolute; left: -12px; top: 3px; width: 4px; height: 4px; background: #333; border-radius: 50%;
 }
 </style>
