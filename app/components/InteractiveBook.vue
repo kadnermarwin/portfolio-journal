@@ -222,26 +222,24 @@ watch(isClosed, (val) => {
     <div class="book-container pointer-events-none" :class="{ 'is-closed': isClosed, 'front-cover': isFrontCoverClosed, 'back-cover': isBackCoverClosed }">
       <div class="book-wrapper pointer-events-none">
         
-        <!-- SVG SPIRAL BINDING (Centered) -->
-        <!-- LEATHER CORDS BINDING -->
+        <!-- BINDER RINGS (Illustration Style) -->
         <div class="hidden md:flex w-16 absolute left-1/2 top-0 bottom-0 -translate-x-1/2 z-[2] pointer-events-none select-none flex-col justify-evenly py-10">
            <div v-for="i in 3" :key="i" class="relative w-full h-8 flex items-center justify-center">
-               <!-- The Cord -->
-               <div class="w-[120%] h-2 bg-[#3e2723] rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.4)] relative z-10 flex items-center justify-center">
-                   <!-- Knot/Stitch Detail -->
-                   <div class="w-8 h-3 bg-[#271c19] rounded-sm absolute left-1/2 -translate-x-1/2 shadow-inner"></div>
-                   <div class="w-full h-[1px] bg-white/10 absolute top-[1px]"></div>
+               <!-- The Ring -->
+               <div class="w-[120%] h-4 bg-[#4a4e51] rounded-full border-2 border-[#2c2c2c] relative z-10 flex items-center justify-center">
+                   <div class="w-full h-[2px] bg-white/20 absolute top-[2px] rounded-t-full"></div>
                </div>
                <!-- Holes on pages -->
-               <div class="absolute right-0 w-3 h-3 rounded-full bg-[#1a1814]/30 shadow-inner -translate-x-1"></div>
+               <div class="absolute right-0 w-3 h-3 rounded-full bg-[#1a1814]/80 border-2 border-[#2c2c2c] -translate-x-1"></div>
+               <div class="absolute left-0 w-3 h-3 rounded-full bg-[#1a1814]/80 border-2 border-[#2c2c2c] translate-x-1"></div>
            </div>
         </div>
 
         <div ref="bookRef" class="flip-book pointer-events-auto shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-300" :class="{ 'hover:scale-[1.02] cursor-pointer': isClosed }" @click="isFrontCoverClosed ? nextPage() : (isBackCoverClosed ? prevPage() : null)">
           
           <!-- COVER PAGE (Right side when closed, but effectively Page 0) -->
-          <div class="page-content cover">
-               <div class="h-full flex flex-col justify-center items-center bg-leather-brown text-white p-10 border-4 border-[#5a2c0c] shadow-inner relative group">
+          <div class="page-content cover" style="background-color: #bd7a46;">
+               <div class="h-full flex flex-col justify-center items-center bg-[#bd7a46] text-white p-10 border-[6px] border-[#2c2c2c] shadow-[inset_0_0_0_8px_rgba(44,44,44,0.1)] relative group">
                   <h1 class="text-6xl font-heading mb-4 text-center">Marwin's<br>Logbook</h1>
                   <p class="text-xl opacity-80 group-hover:scale-110 transition-transform duration-300">Click to Open</p>
                   
@@ -383,8 +381,8 @@ watch(isClosed, (val) => {
           </div>
 
           <!-- BACK COVER -->
-          <div class="page-content cover">
-               <div class="h-full flex justify-center items-center bg-leather-brown text-white p-10 border-4 border-[#5a2c0c] relative">
+          <div class="page-content cover" style="background-color: #bd7a46;">
+               <div class="h-full flex justify-center items-center bg-[#bd7a46] text-white p-10 border-[6px] border-[#2c2c2c] shadow-[inset_0_0_0_8px_rgba(44,44,44,0.1)] relative">
                   <h2 class="text-3xl font-heading">The End</h2>
                   <button 
                     @click.stop="prevPage"
@@ -477,9 +475,12 @@ watch(isClosed, (val) => {
 .page-content {
   background-color: #fdfaf4;
   overflow: hidden;
+  border: 4px solid #2c2c2c;
+  box-sizing: border-box;
 }
 :global(.dark) .page-content {
-  background-color: #2a2824;
+  background-color: #dfd8ca;
+  border: 4px solid #2c2c2c;
 }
 
 /* Override page-flip hover effects forcefully */

@@ -44,9 +44,33 @@ const openItem = (item: string) => {
       
       <!-- Decorations -->
       <TransitionGroup name="fade-item">
+        <div v-show="activeItem === 'table'" key="map" class="table-item decoration decoration-map">
+          <!-- A simple SVG or CSS representation of a map -->
+          <svg viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="150" fill="#e8e2c7" stroke="#2c2c2c" stroke-width="3"/>
+            <path d="M40 0V150M80 0V150M120 0V150M160 0V150M0 40H200M0 80H200M0 120H200" stroke="#d5cead" stroke-width="1.5"/>
+            <path d="M20 150C30 130 50 120 80 140C110 160 140 130 180 150" stroke="#7ab583" stroke-width="3" fill="#a4d1a2" fill-opacity="0.5"/>
+            <circle cx="100" cy="80" r="4" fill="#d9544d" stroke="#2c2c2c" stroke-width="2"/>
+          </svg>
+        </div>
+
+        <div v-show="activeItem === 'table'" key="ivy" class="table-item decoration decoration-ivy">
+          <svg viewBox="0 0 150 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M150 0 C130 20 120 50 140 80 C160 110 120 130 100 150" stroke="#68a562" stroke-width="4" stroke-linecap="round"/>
+            <path d="M150 20 C110 20 90 40 80 70 C70 100 80 120 60 140" stroke="#68a562" stroke-width="4" stroke-linecap="round"/>
+            <path d="M150 50 C120 40 100 10 70 0" stroke="#68a562" stroke-width="4" stroke-linecap="round"/>
+            <!-- Leaves -->
+            <path d="M130 30 C120 20 110 30 120 40 C130 50 140 40 130 30Z" fill="#7ab583" stroke="#2c2c2c" stroke-width="2"/>
+            <path d="M100 50 C90 40 80 50 90 60 C100 70 110 60 100 50Z" fill="#7ab583" stroke="#2c2c2c" stroke-width="2"/>
+            <path d="M130 80 C120 70 110 80 120 90 C130 100 140 90 130 80Z" fill="#7ab583" stroke="#2c2c2c" stroke-width="2"/>
+            <path d="M90 90 C80 80 70 90 80 100 C90 110 100 100 90 90Z" fill="#7ab583" stroke="#2c2c2c" stroke-width="2"/>
+            <!-- Pot partially visible at top right -->
+            <path d="M120 -20 L160 -20 L150 20 L130 20 Z" fill="#d48a60" stroke="#2c2c2c" stroke-width="2"/>
+          </svg>
+        </div>
+
         <div v-show="activeItem === 'table'" key="plant" class="table-item decoration decoration-plant">
           <div class="plant-pot">
-             <div class="plant-dirt"></div>
              <div class="leaf leaf-1"></div>
              <div class="leaf leaf-2"></div>
              <div class="leaf leaf-3"></div>
@@ -58,17 +82,48 @@ const openItem = (item: string) => {
         <div v-show="activeItem === 'table'" key="coffee" class="table-item decoration decoration-coffee">
           <div class="coffee-saucer"></div>
           <div class="coffee-cup">
-            <div class="coffee-liquid"></div>
+            <div class="coffee-liquid">
+              <svg class="steam" viewBox="0 0 50 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 80 Q5 60 15 40 T25 0" stroke="#f0f0f0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+                <path d="M35 70 Q25 50 35 30 T25 -10" stroke="#f0f0f0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+              </svg>
+            </div>
             <div class="coffee-handle"></div>
           </div>
         </div>
 
-        <div v-show="activeItem === 'table'" key="pens" class="table-item decoration decoration-pens">
-          <div class="pen-1"></div>
-          <div class="pen-2"></div>
-          <div class="pencil"></div>
+        <div v-show="activeItem === 'table'" key="shoes" class="table-item decoration decoration-shoes">
+          <svg viewBox="0 0 180 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 130 C10 100 30 70 60 50 C90 30 130 20 160 40 C170 50 170 80 150 100 C130 120 90 130 60 140 C40 145 25 140 20 130Z" fill="#7d8a90" stroke="#2c2c2c" stroke-width="3"/>
+            <path d="M40 70 C70 50 100 40 130 50" stroke="#e8e2c7" stroke-width="15" stroke-linecap="round"/>
+            <path d="M50 100 C80 90 110 80 140 80" stroke="#e8e2c7" stroke-width="15" stroke-linecap="round"/>
+            <path d="M150 80 C160 90 160 100 140 110" fill="#edd65a" stroke="#2c2c2c" stroke-width="2"/>
+            <path d="M16 110 C5 80 25 50 55 30 C85 10 125 0 155 20 C165 30 165 60 145 80 C125 100 85 110 55 120 C35 125 20 120 16 110Z" fill="#9babaf" stroke="#2c2c2c" stroke-width="3"/>
+            <path d="M35 50 C65 30 95 20 125 30" stroke="#e8e2c7" stroke-width="15" stroke-linecap="round" stroke-dasharray="10 5"/>
+            <path d="M45 80 C75 70 105 60 135 60" stroke="#e8e2c7" stroke-width="15" stroke-linecap="round" stroke-dasharray="10 5"/>
+          </svg>
+        </div>
+
+        <div v-show="activeItem === 'table'" key="rope" class="table-item decoration decoration-rope">
+          <svg viewBox="0 0 200 150" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M200 130 C150 140 100 130 60 100 C20 70 10 30 30 10 C50 -10 90 0 110 30 C130 60 120 100 90 120 C60 140 20 130 -10 100" stroke="#909b9f" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M200 130 C150 140 100 130 60 100 C20 70 10 30 30 10 C50 -10 90 0 110 30 C130 60 120 100 90 120 C60 140 20 130 -10 100" stroke="#2c2c2c" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" style="mix-blend-mode: overlay;" />
+            <path d="M200 130 C150 140 100 130 60 100 C20 70 10 30 30 10 C50 -10 90 0 110 30 C130 60 120 100 90 120 C60 140 20 130 -10 100" stroke="#2c2c2c" stroke-width="3" stroke-dasharray="8 4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <div v-show="activeItem === 'table'" key="carabiner" class="table-item decoration decoration-carabiner">
+          <svg viewBox="0 0 80 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 20 C40 10 60 20 70 40 L75 80 C80 100 60 110 40 110 C20 110 10 90 10 70 L5 40 Z" fill="none" stroke="#7bb0ca" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M20 20 C40 10 60 20 70 40 L75 80 C80 100 60 110 40 110 C20 110 10 90 10 70 L5 40 Z" fill="none" stroke="#2c2c2c" stroke-width="16" style="mix-blend-mode: overlay;"/>
+            <path d="M5 40 L10 70" stroke="#d5cead" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M5 40 L10 70" stroke="#2c2c2c" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="40" cy="100" r="4" fill="#2c2c2c"/>
+            <path d="M18 18 C38 8 58 18 68 38 L73 78 C78 98 58 108 38 108 C18 108 8 88 8 68 L3 38 Z" fill="none" stroke="#2c2c2c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
       </TransitionGroup>
+
 
       <!-- Laptop -->
       <Transition name="fade-item">
@@ -164,21 +219,24 @@ const openItem = (item: string) => {
   overflow: hidden;
   background-color: #fdfaf4;
 }
-:global(.dark) .table-environment {
-  background-color: #1a1814;
-}
 
 .desk-surface {
   position: absolute;
   inset: -20vw; /* extended so when zooming we don't clip */
-  background: radial-gradient(circle at center, #4e342e 0%, #2e1d18 100%);
+  background-color: #c99368;
+  background-image: 
+    repeating-linear-gradient(to bottom, transparent, transparent 150px, rgba(44, 44, 44, 0.4) 150px, rgba(44, 44, 44, 0.4) 152px),
+    repeating-linear-gradient(to right, transparent, transparent 80px, rgba(160, 110, 75, 0.1) 80px, rgba(160, 110, 75, 0.1) 85px);
   z-index: 0;
   transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1);
   opacity: 1;
 }
 
 :global(.dark) .desk-surface {
-  background: radial-gradient(circle at center, #2e1d18 0%, #150d0b 100%);
+  background-color: #5d4037;
+  background-image: 
+    repeating-linear-gradient(to bottom, transparent, transparent 150px, rgba(20, 15, 10, 0.5) 150px, rgba(20, 15, 10, 0.5) 152px),
+    repeating-linear-gradient(to right, transparent, transparent 80px, rgba(60, 40, 30, 0.2) 80px, rgba(60, 40, 30, 0.2) 85px);
 }
 
 .table-surface {
@@ -293,14 +351,15 @@ const openItem = (item: string) => {
 }
 
 /* ========================================= */
-/* CAMERA CSS */
+/* CAMERA CSS (Flat Illustration Style) */
 /* ========================================= */
 .camera-item {
-  width: 200px;
-  height: 130px;
-  background: #2b2b2b;
-  border-radius: 12px;
-  box-shadow: 0 15px 25px rgba(0,0,0,0.6), inset 0 2px 3px rgba(255,255,255,0.2);
+  width: 180px;
+  height: 120px;
+  background: #333638;
+  border-radius: 8px;
+  border: 3px solid #2c2c2c;
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.15);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -310,10 +369,9 @@ const openItem = (item: string) => {
 .camera-item::after {
   content: '';
   position: absolute;
-  inset: 5px;
-  border: 1px solid #3c3c3c;
-  border-radius: 8px;
-  pointer-events: none;
+  top: 15px; right: -8px; width: 6px; height: 30px;
+  background: #2c2c2c;
+  border-radius: 0 4px 4px 0;
 }
 .camera-body {
   position: relative;
@@ -322,181 +380,178 @@ const openItem = (item: string) => {
 }
 .camera-flash {
   position: absolute;
-  top: -15px;
+  top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  width: 70px;
-  height: 25px;
-  background: #333;
-  border-radius: 8px 8px 0 0;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.5);
+  width: 60px;
+  height: 16px;
+  background: #2c2c2c;
+  border-radius: 6px 6px 0 0;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 .camera-flash-bulb {
-  width: 40px;
-  height: 12px;
-  background: #fff;
+  width: 30px;
+  height: 8px;
+  background: #e65252;
   border-radius: 4px;
-  box-shadow: inset 0 0 5px #000, 0 0 10px rgba(255,255,255,0.2);
 }
 .camera-shutter {
   position: absolute;
-  top: -8px;
-  right: 20px;
-  width: 30px;
-  height: 8px;
-  background: silver;
-  border-radius: 5px 5px 0 0;
-  box-shadow: inset 0 -2px 5px rgba(0,0,0,0.3);
+  top: -6px;
+  right: 25px;
+  width: 25px;
+  height: 6px;
+  background: #2c2c2c;
+  border-radius: 4px 4px 0 0;
 }
 .camera-lens {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90px;
-  height: 90px;
+  width: 80px;
+  height: 80px;
   background: #111;
   border-radius: 50%;
-  border: 6px solid #444;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,1);
+  border: 5px solid #2c2c2c;
+  box-shadow: 0 0 0 8px #5c6265, -4px 4px 0 rgba(0,0,0,0.2) inset;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 .camera-lens-inner {
-  width: 50px;
-  height: 50px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #597d9a 0%, #0d1b2a 70%);
-  border: 3px solid #000;
-  box-shadow: inset -5px -5px 10px rgba(0,0,0,0.5);
+  background: #7bb0ca;
+  border: 3px solid #2c2c2c;
   position: relative;
+  overflow: hidden;
 }
 .camera-lens-inner::after {
   content: '';
   position: absolute;
-  top: 15%;
-  left: 20%;
-  width: 12px;
-  height: 12px;
-  background: rgba(255,255,255,0.4);
+  top: 5px;
+  left: 5px;
+  width: 15px;
+  height: 15px;
+  background: #fff;
   border-radius: 50%;
+  opacity: 0.8;
 }
 .camera-grip {
   position: absolute;
-  right: 10px;
+  right: 15px;
   top: 50%;
   transform: translateY(-50%);
-  width: 35px;
-  height: 80%;
-  background: #1a1a1a;
-  border-radius: 8px;
-  background-image: radial-gradient(#333 15%, transparent 16%);
-  background-size: 4px 4px;
-  box-shadow: -2px 0 5px rgba(0,0,0,0.5);
+  width: 25px;
+  height: 70%;
+  background: #2c2c2c;
+  border-radius: 4px;
 }
 
 
 /* ========================================= */
-/* LAPTOP CSS */
+/* LAPTOP CSS (Flat Illustration Style) */
 /* ========================================= */
 .laptop-item {
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
+  /* subtle shadow to separate from desk */
+  box-shadow: 8px 12px 0 rgba(0,0,0,0.1);
+  border-radius: 12px;
+  border: 3px solid #2c2c2c;
+  background: #fdfdfd;
 }
 .macbook-screen {
-  width: 380px;
-  height: 240px;
-  background: #000;
-  border-radius: 12px 12px 0 0;
-  box-shadow: inset 0 2px 5px rgba(255,255,255,0.1), 0 -5px 15px rgba(0,0,0,0.5);
-  margin-bottom: -2px;
-  z-index: 1;
-  border-top: 1px solid #4df;
-  border-left: 1px solid #3c3c3c;
-  border-right: 1px solid #3c3c3c;
+  width: 400px;
+  height: 250px;
+  background: #b5c4cb;
+  border-radius: 10px 10px 0 0;
+  border-bottom: 3px solid #2c2c2c;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
   position: relative;
+  padding: 12px;
 }
 .screen-content-preview {
   position: absolute;
-  inset: 6px;
-  background: #0a0a0a;
-  border-radius: 6px;
-  background-image: linear-gradient(135deg, rgba(255,255,255,0.05) 25%, transparent 25%);
+  inset: 16px;
+  background: #7ab583; /* Green background to match the map in illustration */
+  background-image: radial-gradient(circle at center, rgba(255,255,255,0.2) 2px, transparent 2.5px);
+  background-size: 10px 10px;
+  border: 3px solid #2c2c2c;
+  border-radius: 4px;
+  overflow: hidden;
 }
+.screen-content-preview::after {
+  content: ''; /* Mountains */
+  position: absolute;
+  bottom: -5px; left: -10px; right: -10px; height: 120px;
+  background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg"><path d="M0 120L50 40L100 120Z" fill="%2368a562" stroke="%232c2c2c" stroke-width="3"/><path d="M70 120L150 20L230 120Z" fill="%237bb0ca" stroke="%232c2c2c" stroke-width="3"/><path d="M180 120L250 50L320 120Z" fill="%23a4d1a2" stroke="%232c2c2c" stroke-width="3"/><path d="M150 20L120 60L140 70L150 55L160 70L180 60Z" fill="%23fdfdfd" stroke="%232c2c2c" stroke-width="3"/></svg>') bottom center / contain repeat-x;
+}
+
 .screen-content {
   position: absolute;
-  inset: 6px;
-  background: #111;
-  border-radius: 6px;
+  inset: 16px;
+  background: #fdfaf4;
+  border-radius: 4px;
   overflow: hidden;
-  /* Very important: because the laptop is scaled up by 2.8, we might need to apply inverse scaling to the actual webview if it uses absolute px, but for now we let it scale up naturally. */
   display: flex;
+  border: 3px solid #2c2c2c;
 }
-/* If the laptop screen is tiny in px (368x228) we scale it inside the laptop view *only* mentally. The content within LaptopApp will just be responsive. */
 
 .macbook-base {
   width: 400px;
   height: 280px;
-  background: #ccd0d5; 
-  border-radius: 16px;
+  background: #e9eaec; 
+  border-radius: 0 0 10px 10px;
   padding: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.6);
-  z-index: 2;
-  border: 1px solid #aeb4bc;
 }
 :global(.dark) .macbook-base {
-  background: #373a3d; 
-  box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 0 15px rgba(255,255,255,0.2);
-  border: 1px solid #222;
+  background: #8b929a; 
 }
 
 .macbook-keyboard {
   width: 330px;
   height: 140px;
-  background: #1c1c1e;
-  border-radius: 8px;
+  background: #4a4e51;
+  border-radius: 4px;
   margin-bottom: 24px;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.2);
+  border: 3px solid #2c2c2c;
   padding: 4px;
 }
 .keyboard-inner {
   width: 100%;
   height: 100%;
   background-image: 
-    linear-gradient(90deg, transparent 94%, #111 6%),
-    linear-gradient(0deg, transparent 88%, #111 12%);
-  background-size: 22px 22px;
-  border-radius: 4px;
+    repeating-linear-gradient(to right, transparent, transparent 18px, #2c2c2c 18px, #2c2c2c 21px),
+    repeating-linear-gradient(to bottom, transparent, transparent 18px, #2c2c2c 18px, #2c2c2c 21px);
 }
 :global(.dark) .keyboard-inner {
   background-image: 
-    linear-gradient(90deg, transparent 94%, #000 6%),
-    linear-gradient(0deg, transparent 88%, #000 12%);
+    repeating-linear-gradient(to right, transparent, transparent 18px, #2c2c2c 18px, #2c2c2c 21px),
+    repeating-linear-gradient(to bottom, transparent, transparent 18px, #2c2c2c 18px, #2c2c2c 21px);
 }
 
 .macbook-trackpad {
   width: 120px;
-  height: 70px;
-  background: #b5b9bf;
-  border-radius: 8px;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3), 0 1px 0 rgba(255,255,255,0.5);
+  height: 60px;
+  background: #dcdede;
+  border-radius: 4px;
+  border: 3px solid #2c2c2c;
 }
 :global(.dark) .macbook-trackpad {
-  background: #2d2f32;
-  box-shadow: inset 0 1px 4px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.1);
+  background: #73787f;
 }
 
 /* ========================================= */
@@ -554,7 +609,7 @@ const openItem = (item: string) => {
 }
 
 /* ========================================= */
-/* DECORATIONS CSS */
+/* DECORATIONS CSS (Flat Illustration Style) */
 /* ========================================= */
 .decoration {
   position: absolute;
@@ -562,135 +617,128 @@ const openItem = (item: string) => {
   pointer-events: none;
 }
 
-/* Plant */
+/* Map under laptop */
+.decoration-map {
+  left: 6vw;
+  top: 5vh;
+  width: 280px;
+  height: 200px;
+  transform: rotate(-5deg);
+  z-index: 4; /* Below laptop */
+}
+
+/* Ivy */
+.decoration-ivy {
+  right: -20px;
+  top: -20px;
+  width: 250px;
+  height: 250px;
+}
+
+/* Plant in Pot */
 .decoration-plant {
-  right: 18vw;
-  top: 8vh;
-  width: 80px;
-  height: 80px;
-  transform: rotate(15deg);
+  left: 2vw;
+  bottom: 20vh;
+  width: 100px;
+  height: 100px;
+  transform: rotate(25deg);
 }
 .plant-pot {
-  width: 60px;
-  height: 60px;
-  background: #c17754;
+  width: 70px;
+  height: 70px;
+  background: #d48a60;
+  border: 3px solid #2c2c2c;
   border-radius: 50%;
   position: relative;
-  box-shadow: inset -5px -5px 10px rgba(0,0,0,0.3), 5px 15px 15px rgba(0,0,0,0.4);
-}
-.plant-dirt {
-  position: absolute;
-  inset: 8px;
-  background: #3e2723;
-  border-radius: 50%;
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.1);
 }
 .leaf {
   position: absolute;
-  background: #4caf50;
+  background: #7ab583;
+  border: 3px solid #2c2c2c;
   border-radius: 0 50% 0 50%;
-  box-shadow: inset -2px -2px 5px rgba(0,0,0,0.2);
 }
-.leaf-1 { width: 40px; height: 40px; top: -15px; left: -10px; transform: rotate(-20deg); }
-.leaf-2 { width: 50px; height: 50px; top: -20px; right: -15px; transform: rotate(40deg); background: #388e3c; }
-.leaf-3 { width: 45px; height: 45px; top: 10px; right: -25px; transform: rotate(90deg); }
-.leaf-4 { width: 35px; height: 35px; bottom: -10px; left: -10px; transform: rotate(-110deg); background: #2e7d32; }
-.leaf-5 { width: 55px; height: 55px; top: 5px; left: -30px; transform: rotate(-60deg); }
+.leaf-1 { width: 50px; height: 50px; top: -15px; left: -10px; transform: rotate(-20deg); }
+.leaf-2 { width: 60px; height: 60px; top: -20px; right: -15px; transform: rotate(40deg); background: #68a562; }
+.leaf-3 { width: 55px; height: 55px; top: 10px; right: -25px; transform: rotate(90deg); }
+.leaf-4 { width: 45px; height: 45px; bottom: -10px; left: -10px; transform: rotate(-110deg); background: #50874c; }
+.leaf-5 { width: 65px; height: 65px; top: 5px; left: -30px; transform: rotate(-60deg); }
 
 /* Coffee Cup */
 .decoration-coffee {
-  left: 15vw;
-  bottom: 12vh;
-  width: 90px;
-  height: 90px;
-  transform: rotate(-30deg);
+  left: 10vw;
+  top: 45vh;
+  width: 100px;
+  height: 100px;
+  transform: rotate(-15deg);
 }
 .coffee-saucer {
   position: absolute;
   width: 110px;
   height: 110px;
-  background: #e0e0e0;
+  background: #f0f0f0;
+  border: 3px solid #2c2c2c;
   border-radius: 50%;
-  top: -10px;
-  left: -10px;
-  box-shadow: 2px 10px 15px rgba(0,0,0,0.3), inset -2px -2px 5px rgba(255,255,255,0.8);
+  top: -5px;
+  left: -5px;
+  box-shadow: 6px 6px 0 rgba(0,0,0,0.1);
 }
 .coffee-cup {
   position: absolute;
   width: 80px;
   height: 80px;
   background: #fdfdfd;
+  border: 3px solid #2c2c2c;
   border-radius: 50%;
-  box-shadow: inset -3px -3px 10px rgba(0,0,0,0.1), 0 5px 10px rgba(0,0,0,0.2);
+  left: 10px;
+  top: 10px;
 }
 .coffee-liquid {
   position: absolute;
-  inset: 6px;
-  background: #4e342e;
+  inset: 10px;
+  background: #5d4037;
   border-radius: 50%;
-  box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
-  border: 4px solid #8d6e63;
+  border: 3px solid #2c2c2c;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .coffee-handle {
   position: absolute;
   width: 30px;
   height: 20px;
   border: 8px solid #fdfdfd;
-  border-radius: 15px;
-  right: -25px;
+  border-radius: 12px;
+  left: -20px;
   top: 30px;
-  box-shadow: 2px 5px 8px rgba(0,0,0,0.2);
+  z-index: -1;
+  border-color: #2c2c2c #fdfdfd #2c2c2c #2c2c2c;
 }
 
-/* Pens/Pencils */
-.decoration-pens {
-  right: 22vw;
-  bottom: 15vh;
-  width: 100px;
-  height: 100px;
-  transform: rotate(45deg);
+/* Carabiner */
+.decoration-carabiner {
+  left: 20vw;
+  bottom: 8vh;
+  width: 80px;
+  height: 120px;
+  transform: rotate(15deg);
 }
-.pen-1, .pen-2, .pencil {
-  position: absolute;
-  border-radius: 4px;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+
+/* Rope */
+.decoration-rope {
+  left: 5vw;
+  bottom: -5vh;
+  width: 250px;
+  height: 200px;
+  transform: rotate(0deg);
 }
-.pen-1 {
-  width: 120px;
-  height: 12px;
-  background: #111;
-  top: 20px;
-  left: -10px;
-  transform: rotate(-15deg);
-}
-.pen-1::before {
-  content: ''; position: absolute; left: -10px; top: 1px; width: 0; height: 0;
-  border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 10px solid #111;
-}
-.pen-2 {
-  width: 110px;
-  height: 14px;
-  background: #1565c0;
-  top: 40px;
-  left: 0;
-  transform: rotate(5deg);
-}
-.pen-2::before {
-  content: ''; position: absolute; left: -10px; top: 2px; width: 0; height: 0;
-  border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 10px solid #bdbdbd;
-}
-.pencil {
-  width: 100px;
-  height: 10px;
-  background: #fbc02d;
-  top: 60px;
-  left: 10px;
-  transform: rotate(-25deg);
-}
-.pencil::before {
-  content: ''; position: absolute; left: -12px; top: 0; width: 0; height: 0;
-  border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 12px solid #ffcc80;
-}
-.pencil::after {
-  content: ''; position: absolute; left: -12px; top: 3px; width: 4px; height: 4px; background: #333; border-radius: 50%;
+
+/* Shoes */
+.decoration-shoes {
+  right: 5vw;
+  bottom: 5vh;
+  width: 250px;
+  height: 200px;
+  transform: rotate(-10deg);
 }
 </style>
