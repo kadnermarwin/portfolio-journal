@@ -1,15 +1,8 @@
-<svg viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <path id="leaf-shape" d="M 0,50 C 0,25 25,0 50,0 C 50,25 25,50 0,50 Z" stroke="#2c2c2c" stroke-width="3"/>
-  </defs>
-  <g transform="translate(45, 60)">
-    <!-- Leaves -->
-    <use href="#leaf-shape" fill="#7ab583" x="-10" y="-15" width="50" height="50" transform="rotate(-20)"/>
-    <use href="#leaf-shape" fill="#68a562" x="15" y="-30" width="60" height="60" transform="rotate(40)"/>
-    <use href="#leaf-shape" fill="#7ab583" x="35" y="5" width="55" height="55" transform="rotate(90)"/>
-    <use href="#leaf-shape" fill="#50874c" x="-25" y="20" width="45" height="45" transform="rotate(-110)"/>
-    <use href="#leaf-shape" fill="#7ab583" x="-40" y="-5" width="65" height="65" transform="rotate(-60)"/>
-    <!-- Pot -->
-    <circle cx="25" cy="40" r="35" fill="#d48a60" stroke="#2c2c2c" stroke-width="3"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="150" height="150">
+  <circle cx="50" cy="50" r="35" fill="#c46a45" stroke="#2b1a10" stroke-width="3"/>
+  <circle cx="50" cy="50" r="28" fill="#4a3124"/>
+  <path d="M50,50 Q15,30 20,55 Q25,80 50,50" fill="#4caf50" stroke="#1b4520" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M50,50 Q85,30 80,55 Q75,80 50,50" fill="#66bb6a" stroke="#1b4520" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M50,50 Q75,10 50,20 Q25,10 50,50" fill="#43a047" stroke="#1b4520" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M50,50 Q75,90 50,80 Q25,90 50,50" fill="#388e3c" stroke="#1b4520" stroke-width="2" stroke-linejoin="round"/>
 </svg>

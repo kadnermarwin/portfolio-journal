@@ -167,9 +167,8 @@ const openItem = (item: string) => {
 .desk-surface {
   position: absolute;
   inset: -20vw; /* extended so when zooming we don't clip */
-  background-color: #c99368;
   background-image: url('/images/desk/wood-texture.svg');
-  background-size: 300px 300px;
+  background-size: 800px auto;
   background-repeat: repeat;
   z-index: 0;
   transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1);

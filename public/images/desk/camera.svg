@@ -1,29 +1,9 @@
-<svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
-  <g transform="translate(10, 15)">
-    <!-- Flash base (centered at top) -->
-    <path d="M 60 5 L 60 -7 C 60 -10 63 -13 66 -13 L 114 -13 C 117 -13 120 -10 120 -7 L 120 5 Z" fill="#2c2c2c"/>
-    <rect x="75" y="-9" width="30" height="8" rx="4" fill="#e65252"/>
-    
-    <!-- Shutter button -->
-    <path d="M 130 5 L 130 -1 C 130 -3 132 -5 134 -5 L 151 -5 C 153 -5 155 -3 155 -1 L 155 5 Z" fill="#2c2c2c"/>
-    
-    <!-- Body -->
-    <rect x="0" y="5" width="180" height="120" rx="8" fill="#333638" stroke="#2c2c2c" stroke-width="3"/>
-    
-    <!-- Strap loop limit -->
-    <rect x="180" y="20" width="6" height="30" rx="3" fill="#2c2c2c"/>
-    
-    <!-- Grip -->
-    <rect x="140" y="23" width="25" height="84" rx="4" fill="#2c2c2c"/>
-    
-    <!-- Lens outer layer -->
-    <circle cx="90" cy="65" r="40" fill="#111" stroke="#2c2c2c" stroke-width="5"/>
-    <circle cx="90" cy="65" r="32" fill="#111" stroke="#5c6265" stroke-width="8"/>
-    
-    <!-- Inner Lens -->
-    <circle cx="90" cy="65" r="20" fill="#7bb0ca" stroke="#2c2c2c" stroke-width="3"/>
-    
-    <!-- Lens glare -->
-    <circle cx="85" cy="60" r="7" fill="#fff" opacity="0.8"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80" width="150" height="100">
+  <rect x="10" y="15" width="100" height="55" rx="8" fill="#333" stroke="#111" stroke-width="3"/>
+  <rect x="25" y="15" width="70" height="55" fill="#222"/> <circle cx="60" cy="42" r="22" fill="#111" stroke="#555" stroke-width="4"/>
+  <circle cx="60" cy="42" r="16" fill="#0d1b2a"/>
+  <path d="M52,32 Q60,30 68,36" stroke="#fff" fill="none" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
+  <rect x="85" y="10" width="16" height="5" rx="2" fill="#888" stroke="#111" stroke-width="2"/>
+  <circle cx="25" cy="15" r="5" fill="#888" stroke="#111" stroke-width="2"/>
+  <circle cx="95" cy="25" r="3" fill="#d32f2f"/>
 </svg>
