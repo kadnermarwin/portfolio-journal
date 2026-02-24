@@ -1,0 +1,20 @@
+<svg viewBox="0 0 400 530" xmlns="http://www.w3.org/2000/svg">
+  <!-- Screen -->
+  <path d="M 0 10 C 0 4 4 0 10 0 L 390 0 C 396 0 400 4 400 10 L 400 250 L 0 250 Z" fill="#b5c4cb" stroke="#2c2c2c" stroke-width="3"/>
+  <!-- Screen Preview -->
+  <rect x="16" y="16" width="368" height="218" rx="4" fill="#7ab583" stroke="#2c2c2c" stroke-width="3"/>
+  <!-- Base -->
+  <path d="M 0 250 L 400 250 L 400 520 C 400 526 396 530 390 530 L 10 530 C 4 530 0 526 0 520 Z" fill="#e9eaec" stroke="#2c2c2c" stroke-width="3"/>
+  <!-- Keyboard area -->
+  <rect x="35" y="274" width="330" height="140" rx="4" fill="#4a4e51" stroke="#2c2c2c" stroke-width="3"/>
+  <!-- Keys placeholder -->
+  <rect x="40" y="279" width="320" height="130" fill="url(#keys)"/>
+  <!-- Trackpad -->
+  <rect x="140" y="438" width="120" height="60" rx="4" fill="#dcdede" stroke="#2c2c2c" stroke-width="3"/>
+  
+  <defs>
+    <pattern id="keys" width="20" height="20" patternUnits="userSpaceOnUse">
+      <rect x="2" y="2" width="16" height="16" rx="2" fill="#2c2c2c"/>
+    </pattern>
+  </defs>
+</svg>

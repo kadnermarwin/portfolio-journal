@@ -238,19 +238,11 @@ watch(isClosed, (val) => {
         <div ref="bookRef" class="flip-book pointer-events-auto shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-300" :class="{ 'hover:scale-[1.02] cursor-pointer': isClosed }" @click="isFrontCoverClosed ? nextPage() : (isBackCoverClosed ? prevPage() : null)">
           
           <!-- COVER PAGE (Right side when closed, but effectively Page 0) -->
-          <div class="page-content cover" style="background-color: #bd7a46;">
-               <div class="h-full flex flex-col justify-center items-center bg-[#bd7a46] text-white p-10 border-[6px] border-[#2c2c2c] shadow-[inset_0_0_0_8px_rgba(44,44,44,0.1)] relative group">
-                  <h1 class="text-6xl font-heading mb-4 text-center">Marwin's<br>Logbook</h1>
-                  <p class="text-xl opacity-80 group-hover:scale-110 transition-transform duration-300">Click to Open</p>
-                  
-                  <!-- NEXT (Cover) -->
-                  <button 
-                    @click.stop="nextPage"
-                    class="absolute right-4 top-4 transition-all hover:scale-110 active:scale-95 text-[#e6dcc3] hover:text-white font-heading text-2xl rotate-2 opacity-80 hover:opacity-100"
-                    title="Open Book"
-                  >
-                    Open →
-                  </button>
+          <div class="page-content cover relative" style="background: transparent !important;">
+               <img src="/images/desk/journal.svg" class="absolute inset-0 w-full h-full object-fill pointer-events-none" />
+               <div class="h-full flex flex-col justify-center items-center text-white p-10 pl-16 relative z-10 group text-center">
+                  <h1 class="text-6xl font-heading mb-4 text-center text-white drop-shadow-lg">Marwin's<br>Logbook</h1>
+                  <p class="text-xl opacity-80 group-hover:scale-110 transition-transform duration-300 mt-8 bg-black/40 px-6 py-2 rounded-lg backdrop-blur-sm">Click to Open</p>
                </div>
           </div>
 
@@ -381,16 +373,11 @@ watch(isClosed, (val) => {
           </div>
 
           <!-- BACK COVER -->
-          <div class="page-content cover" style="background-color: #bd7a46;">
-               <div class="h-full flex justify-center items-center bg-[#bd7a46] text-white p-10 border-[6px] border-[#2c2c2c] shadow-[inset_0_0_0_8px_rgba(44,44,44,0.1)] relative">
-                  <h2 class="text-3xl font-heading">The End</h2>
-                  <button 
-                    @click.stop="prevPage"
-                    class="absolute left-4 top-4 transition-all hover:scale-110 active:scale-95 text-[#e6dcc3] hover:text-white font-heading text-2xl -rotate-2 opacity-80 hover:opacity-100"
-                    title="Previous Page"
-                  >
-                    ← Back
-                  </button>
+          <div class="page-content cover relative" style="background: transparent !important;">
+               <!-- Flipped horizontally for the back cover binding -->
+               <img src="/images/desk/journal.svg" class="absolute inset-0 w-full h-full object-fill pointer-events-none" style="transform: scaleX(-1);" />
+               <div class="h-full flex justify-center items-center text-white p-10 pr-16 relative z-10">
+                  <h2 class="text-4xl font-heading bg-black/40 px-8 py-4 rounded-lg backdrop-blur-sm shadow-lg text-white">The End</h2>
                </div>
           </div>
 
@@ -492,8 +479,12 @@ watch(isClosed, (val) => {
   filter: none !important;
 }
 
-.cover {
-  background-color: #8b4513;
+.page-content.cover {
+  background-color: transparent !important;
+}
+
+:global(.dark) .page-content.cover {
+  background-color: transparent !important;
 }
 
 /* When flipping, we boost the z-index of the flip-book container.
