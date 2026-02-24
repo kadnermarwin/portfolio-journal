@@ -246,7 +246,7 @@ const openItem = (item: string) => {
 
 /* When desk is active, scatter items slightly */
 .active-table .book-wrapper-table {
-  transform: translate(-45%, -45%) rotate(3deg);
+  transform: translate(-45%, -45%) rotate(6deg) scale(0.65);
 }
 .active-laptop .book-wrapper-table {
   /* Book shouldn't overlap laptop while zoomed in */

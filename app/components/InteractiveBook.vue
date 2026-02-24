@@ -137,25 +137,17 @@ onMounted(async () => {
 
 const nextPage = () => {
   if (pageFlipInstance) {
-    // Eagerly update display page to trigger zoom animations simultaneously
-    if (currentPage.value === 0) {
-      displayPage.value = 1;
-    } else {
-      displayPage.value = currentPage.value + 2;
-    }
-    pageFlipInstance.flipNext();
+    const target = currentPage.value === 0 ? 1 : currentPage.value + 2;
+    const newPath = getRouteFromPageIndex(target);
+    router.push(newPath);
   }
 };
 
 const prevPage = () => {
   if (pageFlipInstance) {
-    // Eagerly update display page to trigger zoom animations simultaneously
-    if (currentPage.value === 1 || currentPage.value === 2) {
-      displayPage.value = 0;
-    } else {
-      displayPage.value = currentPage.value - 2;
-    }
-    pageFlipInstance.flipPrev();
+    const target = (currentPage.value === 1 || currentPage.value === 2) ? 0 : currentPage.value - 2;
+    const newPath = getRouteFromPageIndex(target);
+    router.push(newPath);
   }
 };
 
@@ -408,7 +400,7 @@ watch(isClosed, (val) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all 1s cubic-bezier(0.25, 1, 0.5, 1);
+  transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1);
   transform-origin: center center;
   /* Prevent pointer events on the container itself so we don't block clicks on the table, only the wrapper contents */
   pointer-events: none;
@@ -419,7 +411,7 @@ watch(isClosed, (val) => {
 
 /* When closed, the book scales down but stays in the center */
 .book-container.is-closed.front-cover {
-  transform: scale(0.65) translateX(-25%) rotate(3deg);
+  transform: translateX(-25%);
 }
 .book-container.is-closed.front-cover .flip-book {
   clip-path: polygon(50% -10%, 110% -10%, 110% 110%, 50% 110%);
@@ -427,7 +419,7 @@ watch(isClosed, (val) => {
 
 .book-container.is-closed.back-cover {
   /* Shift to the right by half the container width so the left-sided page sits exactly where the right-sided page sits */
-  transform: scale(0.65) translateX(25%) rotate(3deg);
+  transform: translateX(25%);
 }
 .book-container.is-closed.back-cover .flip-book {
   clip-path: polygon(-10% -10%, 50% -10%, 50% 110%, -10% 110%);
@@ -436,10 +428,10 @@ watch(isClosed, (val) => {
 /* Media query to adjust for mobile/smaller screens where side-by-side might be tight */
 @media (max-width: 1024px) {
   .book-container.is-closed.front-cover {
-    transform: scale(0.6) translateX(-25%) rotate(2deg);
+    transform: translateX(-25%);
   }
   .book-container.is-closed.back-cover {
-    transform: scale(0.6) translateX(25%) rotate(2deg);
+    transform: translateX(25%);
   }
 }
 
