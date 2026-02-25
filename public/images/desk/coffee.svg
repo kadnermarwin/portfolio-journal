@@ -1,0 +1,23 @@
+<svg viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg">
+  <!-- Saucer Drop Shadow (Approximated since svg filter can be complex) -->
+  <circle cx="61" cy="61" r="53.5" fill="rgba(0,0,0,0.1)" />
+  
+  <!-- Saucer -->
+  <circle cx="55" cy="55" r="53.5" fill="#f0f0f0" stroke="#2c2c2c" stroke-width="3" />
+  
+  <!-- Handle (Relative to cup centered at 55, 55. Left offset) -->
+  <path d="M 23 45 L 8 45 Q 0 45 0 55 Q 0 65 8 65 L 23 65" fill="none" stroke="#2c2c2c" stroke-width="11" />
+  <path d="M 23 45 L 8 45 Q 0 45 0 55 Q 0 65 8 65 L 23 65" fill="none" stroke="#f0f0f0" stroke-width="5" />
+  
+  <!-- Cup Body -->
+  <circle cx="55" cy="55" r="38.5" fill="#fdfdfd" stroke="#2c2c2c" stroke-width="3" />
+  
+  <!-- Liquid -->
+  <circle cx="55" cy="55" r="28.5" fill="#5d4037" stroke="#2c2c2c" stroke-width="3" />
+  
+  <!-- Steam (Translated to center of cup, roughly scaled) -->
+  <g transform="translate(30, 20) scale(0.8)">
+    <path d="M15 80 Q5 60 15 40 T25 0" stroke="#f0f0f0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.6" fill="none"/>
+    <path d="M35 70 Q25 50 35 30 T25 -10" stroke="#f0f0f0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.6" fill="none"/>
+  </g>
+</svg>

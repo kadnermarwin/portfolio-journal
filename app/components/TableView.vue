@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import InteractiveBook from '~/components/InteractiveBook.vue';
 import LaptopApp from '~/components/LaptopApp.vue';
 import CameraApp from '~/components/CameraApp.vue';
+import DraggableItem from '~/components/DraggableItem.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -44,42 +45,33 @@ const openItem = (item: string) => {
       
       <!-- Decorations -->
       <TransitionGroup name="fade-item">
-        <div v-show="activeItem === 'table'" key="map" class="table-item decoration decoration-map">
+        <DraggableItem v-show="activeItem === 'table'" key="map" initialCssClass="decoration decoration-map" :isActive="activeItem === 'table'" :scale="0.65">
           <img src="/images/desk/map.svg" class="w-full h-full pointer-events-none" />
-        </div>
+        </DraggableItem>
 
-        <div v-show="activeItem === 'table'" key="ivy" class="table-item decoration decoration-ivy">
+        <DraggableItem v-show="activeItem === 'table'" key="ivy" initialCssClass="decoration decoration-ivy" :isActive="activeItem === 'table'" :scale="0.65">
           <img src="/images/desk/ivy.svg" class="w-full h-full pointer-events-none" />
-        </div>
+        </DraggableItem>
 
-        <div v-show="activeItem === 'table'" key="plant" class="table-item decoration decoration-plant">
+        <DraggableItem v-show="activeItem === 'table'" key="plant" initialCssClass="decoration decoration-plant" :isActive="activeItem === 'table'" :scale="0.65">
           <img src="/images/desk/plant.svg" class="w-full h-full pointer-events-none" />
-        </div>
+        </DraggableItem>
 
-        <div v-show="activeItem === 'table'" key="coffee" class="table-item decoration decoration-coffee">
-          <div class="coffee-saucer"></div>
-          <div class="coffee-cup">
-            <div class="coffee-liquid">
-              <svg class="steam" viewBox="0 0 50 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 80 Q5 60 15 40 T25 0" stroke="#f0f0f0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
-                <path d="M35 70 Q25 50 35 30 T25 -10" stroke="#f0f0f0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
-              </svg>
-            </div>
-            <div class="coffee-handle"></div>
-          </div>
-        </div>
+        <DraggableItem v-show="activeItem === 'table'" key="coffee" initialCssClass="decoration decoration-coffee" :isActive="activeItem === 'table'" :scale="0.65">
+          <img src="/images/desk/coffee.svg" class="w-full h-full pointer-events-none" />
+        </DraggableItem>
 
-        <div v-show="activeItem === 'table'" key="shoes" class="table-item decoration decoration-shoes">
+        <DraggableItem v-show="activeItem === 'table'" key="shoes" initialCssClass="decoration decoration-shoes" :isActive="activeItem === 'table'" :scale="0.65">
           <img src="/images/desk/shoes.svg" class="w-full h-full pointer-events-none" />
-        </div>
+        </DraggableItem>
 
-        <div v-show="activeItem === 'table'" key="rope" class="table-item decoration decoration-rope">
+        <DraggableItem v-show="activeItem === 'table'" key="rope" initialCssClass="decoration decoration-rope" :isActive="activeItem === 'table'" :scale="0.65">
           <img src="/images/desk/rope.svg" class="w-full h-full pointer-events-none" />
-        </div>
+        </DraggableItem>
 
-        <div v-show="activeItem === 'table'" key="carabiner" class="table-item decoration decoration-carabiner">
+        <DraggableItem v-show="activeItem === 'table'" key="carabiner" initialCssClass="decoration decoration-carabiner" :isActive="activeItem === 'table'" :scale="0.65">
           <img src="/images/desk/clips.svg" class="w-full h-full pointer-events-none" />
-        </div>
+        </DraggableItem>
       </TransitionGroup>
 
 
@@ -115,7 +107,7 @@ const openItem = (item: string) => {
           :class="{ 'interactable': activeItem === 'table', 'is-active': activeItem === 'camera' }"
           @click.stop="activeItem === 'table' && openItem('camera')"
         >
-        <div class="camera-item relative w-[180px] h-[120px]">
+        <div class="camera-item relative w-[400px] h-[240px]">
           <img src="/images/desk/camera.svg" class="absolute inset-0 w-full h-full pointer-events-none" />
         </div>
         </div>
@@ -390,7 +382,6 @@ const openItem = (item: string) => {
 .decoration {
   position: absolute;
   z-index: 5;
-  pointer-events: none;
 }
 
 /* Map under laptop */
@@ -427,49 +418,6 @@ const openItem = (item: string) => {
   height: 100px;
   transform: rotate(-15deg);
 }
-.coffee-saucer {
-  position: absolute;
-  width: 110px;
-  height: 110px;
-  background: #f0f0f0;
-  border: 3px solid #2c2c2c;
-  border-radius: 50%;
-  top: -5px;
-  left: -5px;
-  box-shadow: 6px 6px 0 rgba(0,0,0,0.1);
-}
-.coffee-cup {
-  position: absolute;
-  width: 80px;
-  height: 80px;
-  background: #fdfdfd;
-  border: 3px solid #2c2c2c;
-  border-radius: 50%;
-  left: 10px;
-  top: 10px;
-}
-.coffee-liquid {
-  position: absolute;
-  inset: 10px;
-  background: #5d4037;
-  border-radius: 50%;
-  border: 3px solid #2c2c2c;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.coffee-handle {
-  position: absolute;
-  width: 30px;
-  height: 20px;
-  border: 8px solid #fdfdfd;
-  border-radius: 12px;
-  left: -20px;
-  top: 30px;
-  z-index: -1;
-  border-color: #2c2c2c #fdfdfd #2c2c2c #2c2c2c;
-}
-
 /* Carabiner */
 .decoration-carabiner {
   left: 20vw;
