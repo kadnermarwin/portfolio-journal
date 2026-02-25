@@ -9,8 +9,43 @@ import DraggableItem from '~/components/DraggableItem.vue';
 const route = useRoute();
 const router = useRouter();
 
-// activeItem can be 'table', 'book', 'laptop', 'camera'
 const isBookClosed = ref(false);
+
+const itemOffsets = ref({
+  laptop: { dx: 0, dy: 0 },
+  camera: { dx: 0, dy: 0 },
+  book: { dx: 0, dy: 0 }
+});
+
+const handlePositionUpdate = (item: 'laptop'|'camera'|'book', pos: { dx: number, dy: number }) => {
+  itemOffsets.value[item] = pos;
+};
+
+const surfaceStyle = computed(() => {
+  // We need to counteract the exact movement of the item.
+  // The items moved by (dx, dy) within the table-surface wrapper.
+  // Since we transform the table-surface itself, we just need to translate it by (-dx, -dy) 
+  // before we apply the big 3.5x scale, or (-dx * 3.5, -dy * 3.5) if we apply it after.
+  // We apply it in the calc() which is effectively after scale mathematically in translation.
+  if (activeItem.value === 'laptop') {
+    return {
+      '--dynamic-x': `${-itemOffsets.value.laptop.dx * 3.5}px`,
+      '--dynamic-y': `${-itemOffsets.value.laptop.dy * 3.5}px`
+    };
+  } else if (activeItem.value === 'camera') {
+    return {
+      '--dynamic-x': `${-itemOffsets.value.camera.dx * 3.5}px`,
+      '--dynamic-y': `${-itemOffsets.value.camera.dy * 3.5}px`
+    };
+  } else if (activeItem.value === 'book') {
+    // Book scales to 1, so the delta is just dx, dy multiplied by 1
+    return {
+      '--dynamic-x': `${-itemOffsets.value.book.dx}px`,
+      '--dynamic-y': `${-itemOffsets.value.book.dy}px`
+    };
+  }
+  return {};
+});
 
 const activeItem = computed(() => {
   if (route.path === '/') return 'table';
@@ -41,7 +76,7 @@ const openItem = (item: string) => {
     <div class="desk-surface"></div>
     
     <!-- The transformable surface containing all items -->
-    <div class="table-surface" :class="[`active-${activeItem}`]">
+    <div class="table-surface" :class="[`active-${activeItem}`]" :style="surfaceStyle">
       
       <!-- Decorations -->
       <TransitionGroup name="fade-item">
@@ -77,11 +112,14 @@ const openItem = (item: string) => {
 
       <!-- Laptop -->
       <Transition name="fade-item">
-        <div 
+        <DraggableItem
           v-show="activeItem !== 'book'"
-          class="table-item laptop-wrapper" 
-          :class="{ 'interactable': activeItem === 'table', 'is-active': activeItem === 'laptop' }"
-          @click.stop="activeItem === 'table' && openItem('laptop')"
+          initialCssClass="laptop-wrapper" 
+          :class="{ 'is-active': activeItem === 'laptop' }"
+          :isActive="activeItem === 'table'"
+          :scale="0.65"
+          @click="activeItem === 'table' && openItem('laptop')"
+          @update:position="p => handlePositionUpdate('laptop', p)"
         >
         <div class="laptop-item relative w-[28vw] h-[37vw]">
           <img src="/images/desk/laptop.svg" class="absolute inset-0 w-full h-full pointer-events-none" />
@@ -96,32 +134,38 @@ const openItem = (item: string) => {
             </div>
           </div>
         </div>
-        </div>
+        </DraggableItem>
       </Transition>
 
       <!-- Camera -->
       <Transition name="fade-item">
-        <div 
+        <DraggableItem
           v-show="activeItem !== 'book'"
-          class="table-item camera-wrapper" 
-          :class="{ 'interactable': activeItem === 'table', 'is-active': activeItem === 'camera' }"
-          @click.stop="activeItem === 'table' && openItem('camera')"
+          initialCssClass="camera-wrapper" 
+          :class="{ 'is-active': activeItem === 'camera' }"
+          :isActive="activeItem === 'table'"
+          :scale="0.65"
+          @click="activeItem === 'table' && openItem('camera')"
+          @update:position="p => handlePositionUpdate('camera', p)"
         >
         <div class="camera-item relative w-[16vw] h-[10vw]">
           <img src="/images/desk/camera.svg" class="absolute inset-0 w-full h-full pointer-events-none" />
         </div>
-        </div>
+        </DraggableItem>
       </Transition>
 
       <!-- Notebook -->
-      <div 
-        class="table-item book-wrapper-table" 
+      <DraggableItem
+        initialCssClass="book-wrapper-table" 
         :class="{ 'is-active': activeItem === 'book' }"
+        :isActive="activeItem === 'table'"
+        :scale="0.65"
+        @update:position="p => handlePositionUpdate('book', p)"
       >
         <!-- The InteractiveBook itself handles its own internal routing logic -->
         <!-- We removed the click handler here so it doesn't block clicks; we'll click the book directly -->
         <InteractiveBook @update:closed="isBookClosed = $event" />
-      </div>
+      </DraggableItem>
 
     </div>
 
@@ -190,18 +234,19 @@ const openItem = (item: string) => {
 
 /* When book is active, scale to 1 to fit screen */
 .table-surface.active-book {
-  transform: scale(1) translate(0, 0);
+  transform: translate(var(--dynamic-x, 0px), var(--dynamic-y, 0px)) scale(1);
 }
 
 /* LAPTOP ACTIVE: scale heavily and shift to center the laptop */
 /* Focus precisely on the macbook-screen. */
+/* The base translation aligns the screen. The dynamic translation counteracts any drag. */
 .table-surface.active-laptop {
-  transform: translate(122.5vw, calc(112vh + 31.5vw)) scale(3.5);
+  transform: translate(calc(122.5vw + var(--dynamic-x, 0px)), calc(112vh + 31.5vw + var(--dynamic-y, 0px))) scale(3.5);
 }
 
 /* CAMERA ACTIVE: scale heavily and shift to center camera */
 .table-surface.active-camera {
-  transform: translate(-112vw, 112vh) scale(3.5);
+  transform: translate(calc(-112vw + var(--dynamic-x, 0px)), calc(112vh + var(--dynamic-y, 0px))) scale(3.5);
 }
 
 /* ITEM WRAPPERS */

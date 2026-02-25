@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
+const emit = defineEmits(['update:position']);
+
 const props = defineProps<{
   initialCssClass: string;
   isActive: boolean; 
@@ -9,10 +11,14 @@ const props = defineProps<{
 
 const el = ref<HTMLElement | null>(null);
 const position = ref<{ x: number, y: number } | null>(null);
+const totalOffset = ref<{ dx: number, dy: number }>({ dx: 0, dy: 0 });
 const isDragging = ref(false);
+let wasDragged = false;
 
 let startMouseX = 0;
 let startMouseY = 0;
+let dragStartX = 0;
+let dragStartY = 0;
 let initialX = 0;
 let initialY = 0;
 
@@ -27,17 +33,17 @@ const onPointerDown = (e: PointerEvent) => {
       const style = window.getComputedStyle(el.value);
       initialX = style.left !== 'auto' ? parseFloat(style.left) : el.value.offsetLeft;
       initialY = style.top !== 'auto' ? parseFloat(style.top) : el.value.offsetTop;
-    } else {
-      initialX = position.value.x;
-      initialY = position.value.y;
+      position.value = { x: initialX, y: initialY };
     }
-    
-    position.value = { x: initialX, y: initialY };
-    el.value.setPointerCapture(e.pointerId);
+    dragStartX = position.value.x;
+    dragStartY = position.value.y;
   }
   
-  e.preventDefault();
-  e.stopPropagation();
+  wasDragged = false;
+  
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', onPointerUp);
+  window.addEventListener('pointercancel', onPointerUp);
 };
 
 const onPointerMove = (e: PointerEvent) => {
@@ -46,16 +52,45 @@ const onPointerMove = (e: PointerEvent) => {
   const dy = (e.clientY - startMouseY) / props.scale;
   
   position.value = {
-    x: initialX + dx,
-    y: initialY + dy
+    x: dragStartX + dx,
+    y: dragStartY + dy
   };
 };
 
 const onPointerUp = (e: PointerEvent) => {
   if (!isDragging.value) return;
   isDragging.value = false;
-  if (el.value) {
-    el.value.releasePointerCapture(e.pointerId);
+
+  window.removeEventListener('pointermove', onPointerMove);
+  window.removeEventListener('pointerup', onPointerUp);
+  window.removeEventListener('pointercancel', onPointerUp);
+
+  // check if it was just a click
+  const dx = e.clientX - startMouseX;
+  const dy = e.clientY - startMouseY;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  
+  if (dist >= 5) {
+    wasDragged = true;
+    
+    // Calculate total offset from original CSS location 
+    // This allows zooming mathematically reliably
+    totalOffset.value = {
+      dx: position.value!.x - initialX,
+      dy: position.value!.y - initialY
+    };
+
+    // Emit the new position difference
+    emit('update:position', totalOffset.value);
+    
+    setTimeout(() => { wasDragged = false; }, 0);
+  }
+};
+
+const onClickCapture = (e: MouseEvent) => {
+  if (wasDragged) {
+    e.stopPropagation();
+    e.preventDefault();
   }
 };
 </script>
@@ -67,9 +102,7 @@ const onPointerUp = (e: PointerEvent) => {
     :class="[initialCssClass, { 'is-dragging': isDragging, interactable: props.isActive }]"
     :style="position ? { left: position.x + 'px', top: position.y + 'px', right: 'auto', bottom: 'auto' } : {}"
     @pointerdown="onPointerDown"
-    @pointermove="onPointerMove"
-    @pointerup="onPointerUp"
-    @pointercancel="onPointerUp"
+    @click.capture="onClickCapture"
     @dragstart.prevent
   >
     <slot />
