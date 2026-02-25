@@ -68,9 +68,9 @@ onMounted(async () => {
       height: pageHeight, // Base height for aspect ratio
       size: "stretch", // Stretch to container
       minWidth: 300,
-      maxWidth: 2000,
+      maxWidth: 6000,
       minHeight: 400,
-      maxHeight: 2000,
+      maxHeight: 6000,
       showCover: true,
       drawShadow: true,
       maxShadowOpacity: 0.1,
@@ -227,7 +227,7 @@ watch(isClosed, (val) => {
            </div>
         </div>
 
-        <div ref="bookRef" class="flip-book pointer-events-auto shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-300" :class="{ 'hover:scale-[1.02] cursor-pointer': isClosed }" @click="isFrontCoverClosed ? nextPage() : (isBackCoverClosed ? prevPage() : null)">
+        <div ref="bookRef" class="flip-book pointer-events-auto transition-all duration-300" :class="{ 'hover:scale-[1.02] cursor-pointer': isClosed }" @click="isFrontCoverClosed ? nextPage() : (isBackCoverClosed ? prevPage() : null)">
           
           <!-- COVER PAGE (Right side when closed, but effectively Page 0) -->
           <div class="page-content cover relative" style="background: transparent !important;">
@@ -414,7 +414,7 @@ watch(isClosed, (val) => {
   transform: translateX(-25%);
 }
 .book-container.is-closed.front-cover .flip-book {
-  clip-path: polygon(50% -10%, 110% -10%, 110% 110%, 50% 110%);
+  clip-path: polygon(50% -50%, 150% -50%, 150% 150%, 50% 150%);
 }
 
 .book-container.is-closed.back-cover {
@@ -422,7 +422,7 @@ watch(isClosed, (val) => {
   transform: translateX(25%);
 }
 .book-container.is-closed.back-cover .flip-book {
-  clip-path: polygon(-10% -10%, 50% -10%, 50% 110%, -10% 110%);
+  clip-path: polygon(-50% -50%, 50% -50%, 50% 150%, -50% 150%);
 }
 
 /* Media query to adjust for mobile/smaller screens where side-by-side might be tight */
@@ -485,6 +485,10 @@ watch(isClosed, (val) => {
 */
 .flip-book.is-animating {
   z-index: 50 !important;
+}
+
+:global(.stf__wrapper) {
+  box-shadow: 0 1.5vw 3vw rgba(0,0,0,0.5);
 }
 
 

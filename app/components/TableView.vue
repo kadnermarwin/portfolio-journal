@@ -83,11 +83,11 @@ const openItem = (item: string) => {
           :class="{ 'interactable': activeItem === 'table', 'is-active': activeItem === 'laptop' }"
           @click.stop="activeItem === 'table' && openItem('laptop')"
         >
-        <div class="laptop-item relative w-[400px] h-[530px]">
+        <div class="laptop-item relative w-[28vw] h-[37vw]">
           <img src="/images/desk/laptop.svg" class="absolute inset-0 w-full h-full pointer-events-none" />
           
           <!-- The screen -->
-          <div class="macbook-screen-area absolute top-[10px] left-0 w-[400px] h-[240px] flex justify-center items-center px-[12px] pt-[6px] pb-[16px]">
+          <div class="macbook-screen-area absolute top-[0.7vw] left-0 w-[28vw] h-[16.7vw] flex justify-center items-center px-[0.8vw] pt-[0.4vw] pb-[1.1vw]">
             <div class="screen-content" v-if="activeItem === 'laptop'">
               <LaptopApp @close="openItem('table')" />
             </div>
@@ -107,7 +107,7 @@ const openItem = (item: string) => {
           :class="{ 'interactable': activeItem === 'table', 'is-active': activeItem === 'camera' }"
           @click.stop="activeItem === 'table' && openItem('camera')"
         >
-        <div class="camera-item relative w-[400px] h-[240px]">
+        <div class="camera-item relative w-[16vw] h-[10vw]">
           <img src="/images/desk/camera.svg" class="absolute inset-0 w-full h-full pointer-events-none" />
         </div>
         </div>
@@ -196,13 +196,12 @@ const openItem = (item: string) => {
 /* LAPTOP ACTIVE: scale heavily and shift to center the laptop */
 /* Focus precisely on the macbook-screen. */
 .table-surface.active-laptop {
-  transform: translate(133vw, calc(140vh + 490px)) scale(3.5);
+  transform: translate(122.5vw, calc(112vh + 31.5vw)) scale(3.5);
 }
 
 /* CAMERA ACTIVE: scale heavily and shift to center camera */
-/* Camera is at left 88vw, top 12vh. Center is 50vw, 50vh. */
 .table-surface.active-camera {
-  transform: translate(-133vw, 133vh) scale(3.5);
+  transform: translate(-112vw, 112vh) scale(3.5);
 }
 
 /* ITEM WRAPPERS */
@@ -238,7 +237,7 @@ const openItem = (item: string) => {
 
 /* When desk is active, scatter items slightly */
 .active-table .book-wrapper-table {
-  transform: translate(-45%, -45%) rotate(6deg) scale(0.65);
+  transform: translate(-45%, -45%) rotate(6deg) scale(0.4);
 }
 .active-laptop .book-wrapper-table {
   /* Book shouldn't overlap laptop while zoomed in */
@@ -253,9 +252,9 @@ const openItem = (item: string) => {
 /* LAPTOP WRAPPER */
 .laptop-wrapper {
   /* Position cleanly in top left corner */
-  left: 12vw;
-  top: 10vh;
-  width: 400px;
+  left: 15vw;
+  top: 18vh;
+  width: 28vw;
   transform: translate(-50%, -50%) scale(0.85) rotate(-15deg);
   z-index: 10;
 }
@@ -271,9 +270,9 @@ const openItem = (item: string) => {
 /* CAMERA WRAPPER */
 .camera-wrapper {
   /* Position cleanly in top right corner */
-  left: 88vw;
-  top: 12vh;
-  width: 200px;
+  left: 82vw;
+  top: 18vh;
+  width: 16vw;
   transform: translate(-50%, -50%) rotate(25deg);
   z-index: 10;
 }
@@ -308,18 +307,18 @@ const openItem = (item: string) => {
 
 .screen-content-preview {
   position: absolute;
-  inset: 16px;
+  inset: 1.1vw;
   background: transparent;
 }
 
 .screen-content {
   position: absolute;
-  inset: 16px;
+  inset: 1.1vw;
   background: #fdfaf4;
-  border-radius: 4px;
+  border-radius: 0.3vw;
   overflow: hidden;
   display: flex;
-  border: 3px solid #2c2c2c;
+  border: 0.2vw solid #2c2c2c;
 }
 
 /* ========================================= */
@@ -388,25 +387,25 @@ const openItem = (item: string) => {
 .decoration-map {
   left: 6vw;
   top: 5vh;
-  width: 280px;
-  height: 200px;
+  width: 19vw;
+  height: 14vw;
   transform: rotate(-5deg);
   z-index: 4; /* Below laptop */
 }
 
 /* Ivy */
 .decoration-ivy {
-  right: -20px;
-  top: -20px;
-  width: 250px;
-  height: 250px;
+  right: -1.5vw;
+  top: -1.5vw;
+  width: 17vw;
+  height: 17vw;
 }
 
 .decoration-plant {
   left: 2vw;
   bottom: 20vh;
-  width: 120px;
-  height: 120px;
+  width: 9vw;
+  height: 9vw;
   transform: rotate(25deg);
 }
 
@@ -414,16 +413,16 @@ const openItem = (item: string) => {
 .decoration-coffee {
   left: 10vw;
   top: 45vh;
-  width: 100px;
-  height: 100px;
+  width: 7vw;
+  height: 7vw;
   transform: rotate(-15deg);
 }
 /* Carabiner */
 .decoration-carabiner {
   left: 20vw;
   bottom: 8vh;
-  width: 80px;
-  height: 120px;
+  width: 6vw;
+  height: 9vw;
   transform: rotate(15deg);
 }
 
@@ -431,8 +430,8 @@ const openItem = (item: string) => {
 .decoration-rope {
   left: 5vw;
   bottom: -5vh;
-  width: 250px;
-  height: 200px;
+  width: 17vw;
+  height: 14vw;
   transform: rotate(0deg);
 }
 
@@ -440,8 +439,8 @@ const openItem = (item: string) => {
 .decoration-shoes {
   right: 5vw;
   bottom: 5vh;
-  width: 250px;
-  height: 200px;
+  width: 17vw;
+  height: 14vw;
   transform: rotate(-10deg);
 }
 </style>
