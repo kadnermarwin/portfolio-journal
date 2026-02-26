@@ -42,29 +42,29 @@ const projects = [
         <div class="control minimize hover:brightness-90 transition-all"></div>
         <div class="control maximize hover:brightness-90 transition-all"></div>
       </div>
-      <div class="url-bar"><span class="material-symbols-outlined" style="font-size: 10px; margin-right: 4px; vertical-align: middle;">lock</span>marwin.dev/projects</div>
+      <div class="url-bar"><span class="material-symbols-outlined" style="font-size: 10px; margin-right: 4px; vertical-align: middle;">lock</span>kadner.dev/projects</div>
     </div>
     <div class="os-content scrollbar-custom">
       <div class="projects-container">
-        <header class="mb-8 border-b border-gray-200 dark:border-gray-800 pb-5">
-          <h1 class="text-3xl font-bold flex items-center gap-2"><span class="material-symbols-outlined text-3xl">inventory_2</span> My Projects</h1>
-          <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm leading-relaxed">A selection of my recent work and experiments.</p>
+        <header class="mb-5 border-b border-gray-200 dark:border-gray-800 pb-3">
+          <h1 class="text-2xl font-bold flex items-center gap-2"><span class="material-symbols-outlined text-2xl">inventory_2</span> My Projects</h1>
+          <p class="text-gray-500 dark:text-gray-400 mt-1 text-xs leading-relaxed">A selection of my recent work and experiments.</p>
         </header>
         
         <div class="projects-grid">
           <div class="project-card" v-for="(project, i) in projects" :key="i">
-             <div class="flex items-start gap-5">
+             <div class="flex items-start gap-4">
                 <div class="icon-box">
                   <span class="material-symbols-outlined">{{ project.icon }}</span>
                 </div>
                 <div class="flex-grow">
-                   <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ project.title }}</h3>
-                   <span class="text-xs font-semibold uppercase tracking-widest text-blue-500 dark:text-blue-400 mt-1 mb-3 block">{{ project.type }}</span>
-                   <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{{ project.description }}</p>
+                   <h3 class="text-lg font-bold text-gray-900 dark:text-white">{{ project.title }}</h3>
+                   <span class="text-[10px] font-semibold uppercase tracking-widest text-blue-500 dark:text-blue-400 mt-1 mb-2 block">{{ project.type }}</span>
+                   <p class="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{{ project.description }}</p>
                    
-                   <div class="flex flex-wrap gap-3 mt-4">
-                      <a v-for="link in project.links" :key="link.text" :href="link.url" target="_blank" class="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-gray-100/80 hover:bg-gray-200 text-gray-700 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 dark:text-gray-200 rounded-md transition-all font-medium border border-gray-200 dark:border-zinc-700 shadow-sm">
-                        <span class="material-symbols-outlined text-[14px]">{{ link.icon }}</span>
+                   <div class="flex flex-wrap gap-2 mt-3">
+                      <a v-for="link in project.links" :key="link.text" :href="link.url" target="_blank" class="flex items-center gap-1 text-[10px] px-2.5 py-1 bg-gray-100/80 hover:bg-gray-200 text-gray-700 dark:bg-zinc-800/80 dark:hover:bg-zinc-700 dark:text-gray-200 rounded-md transition-all font-medium border border-gray-200 dark:border-zinc-700 shadow-sm">
+                        <span class="material-symbols-outlined text-[12px]">{{ link.icon }}</span>
                         {{ link.text }}
                       </a>
                    </div>
@@ -146,27 +146,26 @@ const projects = [
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
 }
 
-/* Content Area */
 .os-content {
   flex-grow: 1;
-  padding: 30px;
+  padding: 16px;
   overflow-y: auto;
 }
 .projects-container {
-  max-width: 800px;
+  max-width: 600px;
   margin: 0 auto;
 }
 
 .projects-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 20px;
+  gap: 12px;
 }
 
 .project-card {
   border: 1px solid #eaeaea;
   border-radius: 12px;
-  padding: 24px;
+  padding: 16px;
   transition: all 0.2s ease;
   background: #fff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.02);
@@ -186,9 +185,9 @@ const projects = [
 }
 
 .icon-box {
-  width: 50px;
-  height: 50px;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   background: #f0f4ff;
   color: #3b82f6;
   display: flex;
@@ -198,7 +197,7 @@ const projects = [
   border: 1px solid rgba(59, 130, 246, 0.1);
 }
 .icon-box .material-symbols-outlined {
-  font-size: 26px;
+  font-size: 20px;
 }
 :global(.dark) .icon-box {
   background: rgba(59, 130, 246, 0.1);

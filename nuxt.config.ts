@@ -12,8 +12,13 @@ export default defineNuxtConfig({
   app: {
     pageTransition: { name: 'page' },
     head: {
-      title: 'Warm Journal Home Page',
+      title: 'Marwin\'s Desk',
       link: [
+        {
+          rel: 'icon',
+          type: 'image/svg+xml',
+          href: '/images/desk/journal.svg'
+        },
         {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&family=Patrick+Hand&display=swap'
