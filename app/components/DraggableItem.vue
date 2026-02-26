@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { usePointerSwipe } from '@vueuse/core';
 
 const emit = defineEmits(['update:position']);
 
@@ -12,15 +13,51 @@ const props = defineProps<{
 const el = ref<HTMLElement | null>(null);
 const position = ref<{ x: number, y: number } | null>(null);
 const totalOffset = ref<{ dx: number, dy: number }>({ dx: 0, dy: 0 });
-const isDragging = ref(false);
 let wasDragged = false;
 
-let startMouseX = 0;
-let startMouseY = 0;
 let dragStartX = 0;
 let dragStartY = 0;
 let initialX = 0;
 let initialY = 0;
+
+const { isSwiping } = usePointerSwipe(el, {
+  threshold: 0,
+  onSwipeStart(e: PointerEvent) {
+    if (!props.isActive) return;
+
+    if (el.value && !position.value) {
+      const style = window.getComputedStyle(el.value);
+      initialX = style.left !== 'auto' ? parseFloat(style.left) : el.value.offsetLeft;
+      initialY = style.top !== 'auto' ? parseFloat(style.top) : el.value.offsetTop;
+      position.value = { x: initialX, y: initialY };
+    }
+
+    if (position.value) {
+      dragStartX = position.value.x;
+      dragStartY = position.value.y;
+    }
+    wasDragged = false;
+  },
+  onSwipe(e: PointerEvent) {
+    if (!props.isActive || !isSwiping.value) return;
+    
+    // usePointerSwipe handles the initial pointerdown coordinates implicitly, 
+    // but we can calculate dx/dy manually or use the built-in distance.
+    // Actually, usePointerSwipe tracks `distanceX` and `distanceY` reactive refs.
+  },
+  onSwipeEnd(e: PointerEvent) {
+    if (!props.isActive) return;
+  }
+});
+
+// Since usePointerSwipe is a bit too abstract for exact scaled continuous coordinates,
+// let's use useEventListener for a simpler, VueUse-idiomatic global drag listener 
+// while binding the pointer down to the element.
+import { useEventListener } from '@vueuse/core';
+
+const isDragging = ref(false);
+let startMouseX = 0;
+let startMouseY = 0;
 
 const onPointerDown = (e: PointerEvent) => {
   if (!props.isActive) return;
@@ -41,12 +78,13 @@ const onPointerDown = (e: PointerEvent) => {
   
   wasDragged = false;
   
-  window.addEventListener('pointermove', onPointerMove);
-  window.addEventListener('pointerup', onPointerUp);
-  window.addEventListener('pointercancel', onPointerUp);
+  // Use VueUse's useEventListener (it returns a cleanup function) 
+  // but since we want to add/remove them dynamically, we just call it directly.
+  // Actually, VueUse's `useEventListener` automatically cleans up on component unmount.
+  // We can just register them once and use the `isDragging` flag.
 };
 
-const onPointerMove = (e: PointerEvent) => {
+useEventListener('pointermove', (e: PointerEvent) => {
   if (!isDragging.value) return;
   const dx = (e.clientX - startMouseX) / props.scale;
   const dy = (e.clientY - startMouseY) / props.scale;
@@ -55,17 +93,12 @@ const onPointerMove = (e: PointerEvent) => {
     x: dragStartX + dx,
     y: dragStartY + dy
   };
-};
+});
 
-const onPointerUp = (e: PointerEvent) => {
+const handlePointerUp = (e: PointerEvent) => {
   if (!isDragging.value) return;
   isDragging.value = false;
 
-  window.removeEventListener('pointermove', onPointerMove);
-  window.removeEventListener('pointerup', onPointerUp);
-  window.removeEventListener('pointercancel', onPointerUp);
-
-  // check if it was just a click
   const dx = e.clientX - startMouseX;
   const dy = e.clientY - startMouseY;
   const dist = Math.sqrt(dx * dx + dy * dy);
@@ -73,19 +106,19 @@ const onPointerUp = (e: PointerEvent) => {
   if (dist >= 5) {
     wasDragged = true;
     
-    // Calculate total offset from original CSS location 
-    // This allows zooming mathematically reliably
     totalOffset.value = {
       dx: position.value!.x - initialX,
       dy: position.value!.y - initialY
     };
 
-    // Emit the new position difference
     emit('update:position', totalOffset.value);
     
     setTimeout(() => { wasDragged = false; }, 0);
   }
 };
+
+useEventListener('pointerup', handlePointerUp);
+useEventListener('pointercancel', handlePointerUp);
 
 const onClickCapture = (e: MouseEvent) => {
   if (wasDragged) {

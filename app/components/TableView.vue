@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, useTemplateRef } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useTransition, TransitionPresets, useElementHover } from '@vueuse/core';
 import InteractiveBook from '~/components/InteractiveBook.vue';
 import LaptopApp from '~/components/LaptopApp.vue';
 import CameraApp from '~/components/CameraApp.vue';
@@ -21,32 +22,6 @@ const handlePositionUpdate = (item: 'laptop'|'camera'|'book', pos: { dx: number,
   itemOffsets.value[item] = pos;
 };
 
-const surfaceStyle = computed(() => {
-  // We need to counteract the exact movement of the item.
-  // The items moved by (dx, dy) within the table-surface wrapper.
-  // Since we transform the table-surface itself, we just need to translate it by (-dx, -dy) 
-  // before we apply the big 3.5x scale, or (-dx * 3.5, -dy * 3.5) if we apply it after.
-  // We apply it in the calc() which is effectively after scale mathematically in translation.
-  if (activeItem.value === 'laptop') {
-    return {
-      '--dynamic-x': `${-itemOffsets.value.laptop.dx * 3.5}px`,
-      '--dynamic-y': `${-itemOffsets.value.laptop.dy * 3.5}px`
-    };
-  } else if (activeItem.value === 'camera') {
-    return {
-      '--dynamic-x': `${-itemOffsets.value.camera.dx * 3.5}px`,
-      '--dynamic-y': `${-itemOffsets.value.camera.dy * 3.5}px`
-    };
-  } else if (activeItem.value === 'book') {
-    // Book scales to 1, so the delta is just dx, dy multiplied by 1
-    return {
-      '--dynamic-x': `${-itemOffsets.value.book.dx}px`,
-      '--dynamic-y': `${-itemOffsets.value.book.dy}px`
-    };
-  }
-  return {};
-});
-
 const activeItem = computed(() => {
   if (route.path === '/') return 'table';
   if (route.path === '/projects') return 'laptop';
@@ -54,6 +29,64 @@ const activeItem = computed(() => {
   if (route.path.startsWith('/read') && isBookClosed.value) return 'table';
   return 'book';
 });
+
+const targetTransform = computed(() => {
+  if (activeItem.value === 'table') {
+    return [0.65, 0, 3.25, 0, 0, 0];
+  } else if (activeItem.value === 'book') {
+    return [1, 0, 0, 0, -itemOffsets.value.book.dx, -itemOffsets.value.book.dy];
+  } else if (activeItem.value === 'laptop') {
+    return [3.5, 122.5, 112, 31.5, -itemOffsets.value.laptop.dx * 3.5, -itemOffsets.value.laptop.dy * 3.5];
+  } else if (activeItem.value === 'camera') {
+    return [3.5, -112, 112, 0, -itemOffsets.value.camera.dx * 3.5, -itemOffsets.value.camera.dy * 3.5];
+  }
+  return [0.65, 0, 3.25, 0, 0, 0];
+});
+
+const animatedTransformArray = useTransition(targetTransform, {
+  duration: 1200,
+  transition: TransitionPresets.easeOutCubic,
+});
+
+const surfaceStyle = computed(() => {
+  const [scale, xVW, yVH, extraYVW, dynX, dynY] = animatedTransformArray.value;
+  return {
+    transform: `translate(calc(${xVW}vw + ${dynX}px), calc(${yVH}vh + ${extraYVW}vw + ${dynY}px)) scale(${scale})`
+  };
+});
+
+// Item wrapping animations using VueUse
+const laptopRef = ref(null);
+const cameraRef = ref(null);
+
+const extractEl = (refVal: any) => refVal?.$el ?? refVal;
+const isLaptopHovered = useElementHover(() => extractEl(laptopRef.value));
+const isCameraHovered = useElementHover(() => extractEl(cameraRef.value));
+
+const laptopTarget = computed(() => {
+  if (activeItem.value === 'laptop') return [1, 0, -50, -50];
+  if (activeItem.value === 'table' && isLaptopHovered.value) return [0.9, -15, -50, -50];
+  return [0.85, -15, -50, -50];
+});
+
+const cameraTarget = computed(() => {
+  if (activeItem.value === 'camera') return [1, 0, -50, -50];
+  if (activeItem.value === 'table' && isCameraHovered.value) return [1.05, 25, -50, -50];
+  return [1, 25, -50, -50];
+});
+
+const bookTarget = computed(() => {
+  if (activeItem.value === 'book') return [1, 0, -50, -50];
+  return [0.4, 6, -45, -45];
+});
+
+const laptopAnimArr = useTransition(laptopTarget, { duration: 1200, transition: TransitionPresets.easeOutCubic });
+const cameraAnimArr = useTransition(cameraTarget, { duration: 1200, transition: TransitionPresets.easeOutCubic });
+const bookAnimArr = useTransition(bookTarget, { duration: 1200, transition: TransitionPresets.easeOutCubic });
+
+const laptopAnim = computed(() => ({ scale: laptopAnimArr.value[0], rot: laptopAnimArr.value[1], tx: laptopAnimArr.value[2], ty: laptopAnimArr.value[3] }));
+const cameraAnim = computed(() => ({ scale: cameraAnimArr.value[0], rot: cameraAnimArr.value[1], tx: cameraAnimArr.value[2], ty: cameraAnimArr.value[3] }));
+const bookAnim = computed(() => ({ scale: bookAnimArr.value[0], rot: bookAnimArr.value[1], tx: bookAnimArr.value[2], ty: bookAnimArr.value[3] }));
 
 const openItem = (item: string) => {
   if (item === 'book') {
@@ -81,32 +114,32 @@ const openItem = (item: string) => {
       <!-- Decorations -->
       <TransitionGroup name="fade-item">
         <DraggableItem v-show="activeItem === 'table'" key="map" initialCssClass="decoration decoration-map" :isActive="activeItem === 'table'" :scale="0.65">
-          <img src="/images/desk/map.svg" class="w-full h-full pointer-events-none" />
+          <img src="/images/desk/map.png" class="w-full h-full pointer-events-none" />
         </DraggableItem>
 
-        <DraggableItem v-show="activeItem === 'table'" key="ivy" initialCssClass="decoration decoration-ivy" :isActive="activeItem === 'table'" :scale="0.65">
+        <!-- <DraggableItem v-show="activeItem === 'table'" key="ivy" initialCssClass="decoration decoration-ivy" :isActive="activeItem === 'table'" :scale="0.65">
           <img src="/images/desk/ivy.svg" class="w-full h-full pointer-events-none" />
-        </DraggableItem>
+        </DraggableItem> -->
 
         <DraggableItem v-show="activeItem === 'table'" key="plant" initialCssClass="decoration decoration-plant" :isActive="activeItem === 'table'" :scale="0.65">
-          <img src="/images/desk/plant.svg" class="w-full h-full pointer-events-none" />
+          <img src="/images/desk/plant.png" class="w-full h-full pointer-events-none" />
         </DraggableItem>
 
         <DraggableItem v-show="activeItem === 'table'" key="coffee" initialCssClass="decoration decoration-coffee" :isActive="activeItem === 'table'" :scale="0.65">
-          <img src="/images/desk/coffee.svg" class="w-full h-full pointer-events-none" />
+          <img src="/images/desk/coffee.png" class="w-full h-full pointer-events-none" />
         </DraggableItem>
 
-        <DraggableItem v-show="activeItem === 'table'" key="shoes" initialCssClass="decoration decoration-shoes" :isActive="activeItem === 'table'" :scale="0.65">
+        <!-- <DraggableItem v-show="activeItem === 'table'" key="shoes" initialCssClass="decoration decoration-shoes" :isActive="activeItem === 'table'" :scale="0.65">
           <img src="/images/desk/shoes.svg" class="w-full h-full pointer-events-none" />
         </DraggableItem>
 
-        <DraggableItem v-show="activeItem === 'table'" key="rope" initialCssClass="decoration decoration-rope" :isActive="activeItem === 'table'" :scale="0.65">
+        <!-- <DraggableItem v-show="activeItem === 'table'" key="rope" initialCssClass="decoration decoration-rope" :isActive="activeItem === 'table'" :scale="0.65">
           <img src="/images/desk/rope.svg" class="w-full h-full pointer-events-none" />
         </DraggableItem>
 
-        <DraggableItem v-show="activeItem === 'table'" key="carabiner" initialCssClass="decoration decoration-carabiner" :isActive="activeItem === 'table'" :scale="0.65">
+        <!-- <DraggableItem v-show="activeItem === 'table'" key="carabiner" initialCssClass="decoration decoration-carabiner" :isActive="activeItem === 'table'" :scale="0.65">
           <img src="/images/desk/clips.svg" class="w-full h-full pointer-events-none" />
-        </DraggableItem>
+        </DraggableItem> -->
       </TransitionGroup>
 
 
@@ -114,18 +147,20 @@ const openItem = (item: string) => {
       <Transition name="fade-item">
         <DraggableItem
           v-show="activeItem !== 'book'"
+          ref="laptopRef"
           initialCssClass="laptop-wrapper" 
+          :style="{ transform: `translate(${laptopAnim.tx}%, ${laptopAnim.ty}%) scale(${laptopAnim.scale}) rotate(${laptopAnim.rot}deg)` }"
           :class="{ 'is-active': activeItem === 'laptop' }"
           :isActive="activeItem === 'table'"
           :scale="0.65"
           @click="activeItem === 'table' && openItem('laptop')"
           @update:position="p => handlePositionUpdate('laptop', p)"
         >
-        <div class="laptop-item relative w-[28vw] h-[37vw]">
-          <img src="/images/desk/laptop.svg" class="absolute inset-0 w-full h-full pointer-events-none" />
+        <div class="laptop-item relative">
+          <img src="/images/desk/laptop.png" class="absolute inset-0 w-full h-full pointer-events-none" />
           
           <!-- The screen -->
-          <div class="macbook-screen-area absolute top-[0.7vw] left-0 w-[28vw] h-[16.7vw] flex justify-center items-center px-[0.8vw] pt-[0.4vw] pb-[1.1vw]">
+          <div class="macbook-screen-area absolute top-[4.5vw] left-[2.5vw] w-[30vw] h-[16vw] flex justify-center items-center px-[0.8vw] pt-[0.4vw] pb-[1.1vw]">
             <div class="screen-content" v-if="activeItem === 'laptop'">
               <LaptopApp @close="openItem('table')" />
             </div>
@@ -141,7 +176,9 @@ const openItem = (item: string) => {
       <Transition name="fade-item">
         <DraggableItem
           v-show="activeItem !== 'book'"
+          ref="cameraRef"
           initialCssClass="camera-wrapper" 
+          :style="{ transform: `translate(${cameraAnim.tx}%, ${cameraAnim.ty}%) scale(${cameraAnim.scale}) rotate(${cameraAnim.rot}deg)` }"
           :class="{ 'is-active': activeItem === 'camera' }"
           :isActive="activeItem === 'table'"
           :scale="0.65"
@@ -149,7 +186,7 @@ const openItem = (item: string) => {
           @update:position="p => handlePositionUpdate('camera', p)"
         >
         <div class="camera-item relative w-[16vw] h-[10vw]">
-          <img src="/images/desk/camera.svg" class="absolute inset-0 w-full h-full pointer-events-none" />
+          <img src="/images/desk/camera.png" class="absolute inset-0 w-full h-full pointer-events-none" />
         </div>
         </DraggableItem>
       </Transition>
@@ -157,6 +194,11 @@ const openItem = (item: string) => {
       <!-- Notebook -->
       <DraggableItem
         initialCssClass="book-wrapper-table" 
+        :style="{ 
+          transform: `translate(${bookAnim.tx}%, ${bookAnim.ty}%) scale(${bookAnim.scale}) rotate(${bookAnim.rot}deg)`,
+          opacity: (activeItem !== 'table' && activeItem !== 'book') ? 0.8 : 1,
+          pointerEvents: (activeItem !== 'table' && activeItem !== 'book') ? 'none' : 'auto'
+        }"
         :class="{ 'is-active': activeItem === 'book' }"
         :isActive="activeItem === 'table'"
         :scale="0.65"
@@ -223,37 +265,14 @@ const openItem = (item: string) => {
   width: 100vw;
   height: 100vh;
   z-index: 1;
-  transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+  /* transition property removed as VueUse handles interpolation now */
   transform-origin: center center;
-}
-
-/* Base states: When desk is viewed, zoom out */
-.table-surface.active-table {
-  transform: scale(0.65) translate(0, 5vh);
-}
-
-/* When book is active, scale to 1 to fit screen */
-.table-surface.active-book {
-  transform: translate(var(--dynamic-x, 0px), var(--dynamic-y, 0px)) scale(1);
-}
-
-/* LAPTOP ACTIVE: scale heavily and shift to center the laptop */
-/* Focus precisely on the macbook-screen. */
-/* The base translation aligns the screen. The dynamic translation counteracts any drag. */
-.table-surface.active-laptop {
-  transform: translate(calc(122.5vw + var(--dynamic-x, 0px)), calc(112vh + 31.5vw + var(--dynamic-y, 0px))) scale(3.5);
-}
-
-/* CAMERA ACTIVE: scale heavily and shift to center camera */
-.table-surface.active-camera {
-  transform: translate(calc(-112vw + var(--dynamic-x, 0px)), calc(112vh + var(--dynamic-y, 0px))) scale(3.5);
 }
 
 /* ITEM WRAPPERS */
 .table-item {
   position: absolute;
-  transform-style: preserve-3d;
-  transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+  /* transition property removed as VueUse handles interpolation now */
 }
 
 /* Hover highlights for interactable items */
@@ -274,16 +293,12 @@ const openItem = (item: string) => {
   /* Ensure it has full screen size for the book to unfold properly */
   width: 100vw; 
   height: 100vh;
-  transform: translate(-50%, -50%) rotate(0deg);
   z-index: 5;
   pointer-events: none; /* Let clicks pass through to laptop and camera */
 }
 
 
 /* When desk is active, scatter items slightly */
-.active-table .book-wrapper-table {
-  transform: translate(-45%, -45%) rotate(6deg) scale(0.4);
-}
 .active-laptop .book-wrapper-table {
   /* Book shouldn't overlap laptop while zoomed in */
   opacity: 0.8;
@@ -299,17 +314,11 @@ const openItem = (item: string) => {
   /* Position cleanly in top left corner */
   left: 15vw;
   top: 18vh;
-  width: 28vw;
-  transform: translate(-50%, -50%) scale(0.85) rotate(-15deg);
+  width: 40vw;
   z-index: 10;
 }
 .active-laptop .laptop-wrapper {
-  /* correct the rotation when zoomed in */
-  transform: translate(-50%, -50%) scale(1) rotate(0deg);
   z-index: 20;
-}
-.active-table .laptop-wrapper:hover {
-  transform: translate(-50%, -50%) scale(0.9) rotate(-15deg);
 }
 
 /* CAMERA WRAPPER */
@@ -317,16 +326,11 @@ const openItem = (item: string) => {
   /* Position cleanly in top right corner */
   left: 82vw;
   top: 18vh;
-  width: 16vw;
-  transform: translate(-50%, -50%) rotate(25deg);
+  width: 25vw;
   z-index: 10;
 }
 .active-camera .camera-wrapper {
-  transform: translate(-50%, -50%) rotate(0deg);
   z-index: 20;
-}
-.active-table .camera-wrapper:hover {
-  transform: translate(-50%, -50%) rotate(25deg) scale(1.05);
 }
 
 /* ========================================= */
@@ -336,6 +340,8 @@ const openItem = (item: string) => {
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 18vw;
+  width: 25vw;
   transition: all 0.3s ease;
 }
 
@@ -348,6 +354,13 @@ const openItem = (item: string) => {
   flex-direction: column;
   align-items: center;
   position: relative;
+  width: 40vw;
+  height: 40vw;
+  transform: rotate(14deg);
+}
+
+.macbook-screen-area {
+  transform: rotate(-15deg);
 }
 
 .screen-content-preview {
@@ -432,8 +445,8 @@ const openItem = (item: string) => {
 .decoration-map {
   left: 6vw;
   top: 5vh;
-  width: 19vw;
-  height: 14vw;
+  width: 40vw;
+  height: 33vw;
   transform: rotate(-5deg);
   z-index: 4; /* Below laptop */
 }
@@ -449,18 +462,16 @@ const openItem = (item: string) => {
 .decoration-plant {
   left: 2vw;
   bottom: 20vh;
-  width: 9vw;
-  height: 9vw;
-  transform: rotate(25deg);
+  width: 40vw;
+  height: 40vw;
 }
 
 /* Coffee Cup */
 .decoration-coffee {
   left: 10vw;
   top: 45vh;
-  width: 7vw;
-  height: 7vw;
-  transform: rotate(-15deg);
+  width: 30vw;
+  height: 25vw;
 }
 /* Carabiner */
 .decoration-carabiner {
