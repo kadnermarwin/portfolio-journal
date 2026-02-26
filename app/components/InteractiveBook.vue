@@ -3,9 +3,8 @@ import { ref, onMounted, onBeforeUnmount, watch, nextTick, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router';
 import Intro from '~/components/content/Intro.vue'
 import Garden from '~/components/content/Garden.vue'
-import Projects from '~/components/content/Projects.vue'
+
 import Cv from '~/components/content/Cv.vue'
-import Photos from '~/components/content/Photos.vue'
 import BookPage from '~/components/BookPage.vue'
 
 const bookRef = ref(null);
@@ -263,57 +262,6 @@ watch(isClosed, (val) => {
               </button>
             </BookPage>
           </div>
-          
-          <div class="page-content">
-            <BookPage class="h-full relative">
-              <Garden side="left" />
-              <button 
-                 @click.stop="prevPage"
-                 class="absolute left-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 -rotate-2"
-                 title="Previous"
-              >
-                ← Back
-              </button>
-            </BookPage>
-          </div>
-          <div class="page-content">
-            <BookPage class="h-full relative">
-              <Garden side="right" />
-               <button 
-                 @click.stop="nextPage"
-                 class="absolute right-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 rotate-2"
-                 title="Next"
-              >
-                Next →
-              </button>
-            </BookPage>
-          </div>
-
-          <div class="page-content">
-            <BookPage class="h-full relative">
-              <Projects side="left" />
-               <button 
-                 @click.stop="prevPage"
-                 class="absolute left-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 -rotate-2"
-                 title="Previous"
-              >
-                ← Back
-              </button>
-            </BookPage>
-          </div>
-          <div class="page-content">
-            <BookPage class="h-full relative">
-              <Projects side="right" />
-               <button 
-                 @click.stop="nextPage"
-                 class="absolute right-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 rotate-2"
-                 title="Next"
-              >
-                Next →
-              </button>
-            </BookPage>
-          </div>
-
           <div class="page-content">
             <BookPage class="h-full relative">
                <Cv side="left" />
@@ -341,8 +289,8 @@ watch(isClosed, (val) => {
 
           <div class="page-content">
             <BookPage class="h-full relative">
-               <Photos side="left" />
-               <button 
+              <Garden side="left" />
+              <button 
                  @click.stop="prevPage"
                  class="absolute left-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 -rotate-2"
                  title="Previous"
@@ -353,7 +301,7 @@ watch(isClosed, (val) => {
           </div>
           <div class="page-content">
             <BookPage class="h-full relative">
-               <Photos side="right" />
+              <Garden side="right" />
                <button 
                  @click.stop="nextPage"
                  class="absolute right-4 top-4 z-10 font-heading text-xl text-[#5d4037]/60 hover:text-[#3e2723] transition-all hover:scale-110 rotate-2"
@@ -363,7 +311,6 @@ watch(isClosed, (val) => {
               </button>
             </BookPage>
           </div>
-
           <!-- BACK COVER -->
           <div class="page-content cover relative" style="background: transparent !important;">
                <!-- Flipped horizontally for the back cover binding -->

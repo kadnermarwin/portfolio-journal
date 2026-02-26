@@ -443,10 +443,10 @@ const openItem = (item: string) => {
 
 /* Map under laptop */
 .decoration-map {
-  left: 6vw;
-  top: 5vh;
-  width: 40vw;
-  height: 33vw;
+  left: -30vw;
+  top: -30vh;
+  width: 70vw;
+  height: 50vw;
   transform: rotate(-5deg);
   z-index: 4; /* Below laptop */
 }
@@ -460,16 +460,16 @@ const openItem = (item: string) => {
 }
 
 .decoration-plant {
-  left: 2vw;
-  bottom: 20vh;
-  width: 40vw;
-  height: 40vw;
+  top: -20vw;
+  right: -50vh;
+  width: 50vw;
+  height: 50vw;
 }
 
 /* Coffee Cup */
 .decoration-coffee {
-  left: 10vw;
-  top: 45vh;
+  right: -10vw;
+  top: 30vh;
   width: 30vw;
   height: 25vw;
 }

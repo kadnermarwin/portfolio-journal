@@ -30,9 +30,9 @@
         <div class="absolute top-4 right-4 text-leather-brown/20 dark:text-white/10 transition-colors duration-300">
           <span class="material-symbols-outlined text-4xl">code_blocks</span>
         </div>
-        <h3 class="font-heading text-2xl text-accent-orange mb-4 transition-colors duration-300">The Logic & The Line</h3>
+        <h3 class="font-heading text-2xl text-accent-orange mb-4 transition-colors duration-300">About Me</h3>
         <p class="font-body text-xl leading-relaxed text-leather-brown/80 dark:text-orange-50/70 transition-colors duration-300">
-          Computer Science student by day, bouldering enthusiast by twilight. I find a strange parallel between a complex codebase and a technical V6—both require patience, precision, and the courage to fall before you reach the top.
+          Hi there! I'm Marwin, 26 and currently studying computer science  at Karlsruhe Institute of Technology. In my freetime I love to climb and work on different side projects. You are currently looking at a journal on my desk, feel free to further explore and find some of my projects, thoughts and pictures. 
         </p>
       </div>
 
@@ -42,9 +42,13 @@
             <span class="material-symbols-outlined text-xl">terminal</span> Tech Stack
           </h4>
           <ul class="font-body text-lg text-leather-brown/80 dark:text-orange-50/70 space-y-1 ml-1 transition-colors duration-300">
-            <li>• Rust / Python</li>
-            <li>• React & Tailwind</li>
-            <li>• Neovim / Arch</li>
+            <li>• Python</li>
+            <li>• Java/C#</li>
+            <li>• C(++)</li>
+            <li>• React & Next.js</li>
+            <li>• Vue & Nuxt.js</li>
+            <li>• Design with Tailwind</li>
+            <li>• MacOS and Linux</li>
           </ul>
         </div>
         <div class="p-6 rounded-2xl border-2 border-dashed border-leather-brown/20 dark:border-white/10 bg-white/30 dark:bg-black/20 rotate-2 hover:rotate-0 transition-transform duration-300">
@@ -52,7 +56,7 @@
             <span class="material-symbols-outlined text-xl">mountain_flag</span> Current Goal
           </h4>
           <p class="font-body text-lg text-leather-brown/80 dark:text-orange-50/70 leading-relaxed transition-colors duration-300">
-            Sending my first 7A outdoors & mastering async Rust.
+            Finishing my Cogni project and sending my first 7A outdoors.
           </p>
         </div>
       </div>
@@ -113,10 +117,6 @@
           <circle cx="50" cy="25" fill="currentColor" r="2.5"></circle>
         </svg>
       </div>
-      <div class="font-body text-right text-leather-brown/60 dark:text-orange-100/40 leading-tight tracking-wide transition-colors duration-300">
-        <p>Climb high,</p>
-        <p>stay humble.</p>
-      </div>
     </div>
 
     <div class="absolute bottom-6 right-16 opacity-10 font-mono text-[10px] text-leather-brown dark:text-white select-none transition-colors duration-300">
@@ -152,10 +152,8 @@ defineProps<{
 }>()
 
 const navItems = [
-  { title: 'Digital Garden', icon: 'edit_note', link: '/read/2' },
-  { title: 'Code Repo', icon: 'inventory_2', link: '/read/3' },
-  { title: 'The Beta (CV)', icon: 'history_edu', link: '/read/4' },
-  { title: 'Crag Snapshots', icon: 'photo_camera', link: '/read/5' },
+  { title: 'Curriculum Vitae', icon: 'history_edu', link: '/read/2' },
+  { title: 'Thoughts and Rants', icon: 'edit_note', link: '/read/3' },
 ]
 
 // -- Post-It Dragging Logic --
